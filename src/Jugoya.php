@@ -14,7 +14,7 @@ class Jugoya
     private $middlewareResolver;
 
     /**
-     * @var DelegateInterface|null
+     * @var DelegateInterface|callable|null
      */
     private $coreDelegate = null;
 
@@ -75,7 +75,7 @@ class Jugoya
     }
 
     /**
-     * @param mixed $delegate
+     * @param DelegateInterface|callable $delegate
      * @return DelegateInterface
      */
     private function resolveDelegate($delegate)
