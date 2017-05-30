@@ -1,6 +1,8 @@
 # Jugoya
 A PSR-15 HTTP application builder.
 
+[![Build Status](https://scrutinizer-ci.com/g/n1215/jugoya/badges/build.png?b=master)](https://scrutinizer-ci.com/g/n1215/jugoya/build-status/master)[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/n1215/jugoya/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/n1215/jugoya/?branch=master)
+
 # Example
 
         // 1. register middleware dependencies to the PSR-11 Container
