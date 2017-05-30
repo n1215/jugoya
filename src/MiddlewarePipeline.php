@@ -23,7 +23,7 @@ class MiddlewarePipeline implements MiddlewareInterface
      */
     public function __construct(array $queue)
     {
-        foreach($queue as $middleware) {
+        foreach ($queue as $middleware) {
             $this->add($middleware);
         }
     }
