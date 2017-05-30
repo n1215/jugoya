@@ -47,7 +47,7 @@ class Jugoya
      */
     public function middleware(array $entries)
     {
-        foreach($entries as $entry) {
+        foreach ($entries as $entry) {
             $this->middlewareEntries[] = $entry;
         }
         return $this;
@@ -58,7 +58,7 @@ class Jugoya
      */
     public function build()
     {
-        if(is_null($this->coreDelegate)) {
+        if (is_null($this->coreDelegate)) {
             throw new \LogicException('Please call Jugoya::from() and set a core delegate before build an HTTP Application.');
         }
 
@@ -80,12 +80,12 @@ class Jugoya
      */
     private function resolveDelegate($delegate)
     {
-        if($delegate instanceof DelegateInterface) {
+        if ($delegate instanceof DelegateInterface) {
             return $delegate;
         }
 
         if (is_callable($delegate)) {
-             return new CallableDelegate($delegate);
+                return new CallableDelegate($delegate);
         }
 
         throw new \LogicException('$delegate must be one of an DelegateInterface or a callable');

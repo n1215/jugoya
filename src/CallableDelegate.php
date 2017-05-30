@@ -30,7 +30,7 @@ class CallableDelegate implements DelegateInterface
     {
         $response = call_user_func($this->callable, $request);
 
-        if(!$response instanceof ResponseInterface) {
+        if (!$response instanceof ResponseInterface) {
             throw new \LogicException('callable must return an instance of Psr\Http\Message\ResponseInterface.');
         }
 

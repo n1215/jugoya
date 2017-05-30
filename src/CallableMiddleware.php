@@ -33,7 +33,7 @@ class CallableMiddleware implements MiddlewareInterface
     {
         $response = call_user_func($this->callable, $request, $delegate);
 
-        if(!$response instanceof ResponseInterface) {
+        if (!$response instanceof ResponseInterface) {
             throw new \LogicException('callable must return an instance of \Psr\Http\Message\ResponseInterface.');
         }
 
