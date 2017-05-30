@@ -11,6 +11,7 @@ use Zend\Diactoros\ServerRequest;
 
 class JugoyaTest extends TestCase
 {
+
     protected function tearDown()
     {
         parent::tearDown();

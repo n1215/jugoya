@@ -7,9 +7,6 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Class MiddlewarePipeline
- */
 class MiddlewarePipeline implements MiddlewareInterface
 {
 

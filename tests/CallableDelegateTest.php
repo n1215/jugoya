@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class CallableDelegateTest extends TestCase
 {
+
     protected function tearDown()
     {
         parent::tearDown();

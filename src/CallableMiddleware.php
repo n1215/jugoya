@@ -16,7 +16,6 @@ class CallableMiddleware implements MiddlewareInterface
     private $callable;
 
     /**
-     * CallableDelegate constructor.
      * @param callable $callable
      */
     public function __construct(callable $callable)

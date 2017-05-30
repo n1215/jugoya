@@ -5,11 +5,9 @@ namespace N1215\Jugoya;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Container\ContainerInterface;
 
-/**
- * Class MiddlewarePipeline
- */
 class MiddlewareResolver implements MiddlewareResolverInterface
 {
+
     /**
      * @var ContainerInterface
      */
@@ -24,7 +22,7 @@ class MiddlewareResolver implements MiddlewareResolverInterface
     }
 
     /**
-     * @param mixed $entry
+     * @param string|callable|MiddlewareInterface $entry
      * @return MiddlewareInterface
      */
     public function resolve($entry)

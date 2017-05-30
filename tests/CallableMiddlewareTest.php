@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class CallableMiddlewareTest extends TestCase
 {
+
     protected function tearDown()
     {
         parent::tearDown();

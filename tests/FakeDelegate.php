@@ -8,6 +8,7 @@ use Zend\Diactoros\Response\TextResponse;
 
 class FakeDelegate implements DelegateInterface
 {
+
     /**
      * @var string
      */

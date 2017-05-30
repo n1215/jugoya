@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class FakeMiddleware implements MiddlewareInterface
 {
+
     const ATTRIBUTE_KEY = 'fake_middleware';
 
     /**

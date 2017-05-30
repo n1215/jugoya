@@ -11,6 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class MiddlewareResolverTest extends TestCase
 {
+
     protected function tearDown()
     {
         parent::tearDown();

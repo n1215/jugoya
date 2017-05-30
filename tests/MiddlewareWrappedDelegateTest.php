@@ -10,6 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class MiddlewareWrappedDelegateTest extends TestCase
 {
+
     protected function tearDown()
     {
         parent::tearDown();

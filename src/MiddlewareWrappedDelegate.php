@@ -21,7 +21,6 @@ class MiddlewareWrappedDelegate implements DelegateInterface
     private $middleware;
 
     /**
-     * MiddlewareWrappedDelegate constructor.
      * @param DelegateInterface $delegate
      * @param MiddlewareInterface $middleware
      */
