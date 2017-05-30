@@ -1,4 +1,4 @@
-# Jugoya
+# Jugoya（十五夜）🌕
 A PSR-15 HTTP application builder.
 
 [![Latest Stable Version](https://poser.pugx.org/n1215/jugoya/v/stable)](https://packagist.org/packages/n1215/jugoya)
