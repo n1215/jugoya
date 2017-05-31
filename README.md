@@ -10,7 +10,7 @@ A PSR-15 HTTP application builder.
 # Example
 
 ```php
-// 1. register middleware dependencies to the PSR-11 Container
+// 1. register delegate and middleware dependencies to the PSR-11 Container
 /** @var \Psr\Container\ContainerInterface $container */
 $container = new YourContainer();
 //
@@ -22,13 +22,24 @@ $container = new YourContainer();
 $builder = \N1215\Jugoya\Jugoya::fromContainer($container);
 
 // 3. build an http application
-/** @var DelegateInterface|callable|string $coreDelegate */
+/**
+ * You can use one of
+ *   * an instance of PSR-15 DelegateInterface
+ *   * a callable having the same signature with PSR-15 DelegateInterface
+ *   * a string identifier of a PSR-15 DelegateInterface instance in the PSR-11 Container
+ *
+ * @var DelegateInterface|callable|string $coreDelegate
+ *
+ */
 $coreDelegate = new YourApplication();
 
 /** @var HttpApplication|DelegateInterface $app */
 $app = $builder->build($coreDelegate, [
 
-        // a callable having the same signature with PSR-15 MiddlewareInterface
+        // You can use instances of PSR-15 MiddlewareInterface
+        new YourMiddleware(),
+
+        // or callables having the same signature with PSR-15 MiddlewareInterface
         function(ServerRequestInterface $request, DelegateInterface $delegate) {
             // do stuff
             $response = $delegate->process($request);
@@ -36,10 +47,7 @@ $app = $builder->build($coreDelegate, [
             return $response;
         },
 
-        // an instance of PSR-15 MiddlewareInterface
-        new YourMiddleware(),
-
-        // a key string for an instance of PSR-15 MiddlewareInterface in the PSR-11 Container
+        // or string identifiers of PSR-15 MiddlewareInterface instances in the PSR-11 Container
         YourMiddleware::class,
     ]);
 
