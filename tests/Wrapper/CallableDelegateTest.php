@@ -1,6 +1,6 @@
 <?php
 
-namespace N1215\Jugoya;
+namespace N1215\Jugoya\Wrapper;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;

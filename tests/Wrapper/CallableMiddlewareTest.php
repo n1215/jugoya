@@ -1,6 +1,6 @@
 <?php
 
-namespace N1215\Jugoya;
+namespace N1215\Jugoya\Wrapper;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use PHPUnit\Framework\TestCase;

@@ -4,9 +4,19 @@ namespace N1215\Jugoya;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use N1215\Jugoya\Resolver\DelegateResolver;
+use N1215\Jugoya\Resolver\DelegateResolverInterface;
+use N1215\Jugoya\Resolver\MiddlewareResolver;
+use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
+use Psr\Container\ContainerInterface;
 
 class Jugoya
 {
+
+    /**
+     * @var DelegateResolverInterface
+     */
+    private $delegateResolver;
 
     /**
      * @var MiddlewareResolverInterface
@@ -14,81 +24,42 @@ class Jugoya
     private $middlewareResolver;
 
     /**
-     * @var DelegateInterface|callable|null
+     * @param DelegateResolverInterface $delegateResolver
+     * @param MiddlewareResolverInterface $middlewareResolver
      */
-    private $coreDelegate = null;
-
-    /**
-     * @var MiddlewareInterface[]|callable[]|string[]
-     */
-    private $middlewareEntries = [];
-
-    /**
-     * @param MiddlewareResolverInterface $resolver
-     */
-    public function __construct(MiddlewareResolverInterface $resolver)
-    {
-        $this->middlewareResolver = $resolver;
+    public function __construct(
+        DelegateResolverInterface $delegateResolver,
+        MiddlewareResolverInterface $middlewareResolver
+    ) {
+        $this->delegateResolver = $delegateResolver;
+        $this->middlewareResolver = $middlewareResolver;
     }
 
     /**
-     * @param DelegateInterface|callable $coreDelegate
-     * @return Jugoya
+     * @param ContainerInterface $container
+     * @return static
      */
-    public function from($coreDelegate)
+    public static function fromContainer(ContainerInterface $container)
     {
-        $this->coreDelegate = $coreDelegate;
-        return $this;
+        return new static(new DelegateResolver($container), new MiddlewareResolver($container));
     }
 
     /**
-     * @param MiddlewareInterface[]|callable[]|string[] $entries
-     * @return Jugoya
-     */
-    public function middleware(array $entries)
-    {
-        foreach ($entries as $entry) {
-            $this->middlewareEntries[] = $entry;
-        }
-        return $this;
-    }
-
-    /**
+     * @param DelegateInterface|callable|string $coreDelegateEntry
+     * @param MiddlewareInterface[]|callable[]|string[] $middlewareEntries
      * @return HttpApplication
      */
-    public function build()
+    public function build($coreDelegateEntry, array $middlewareEntries)
     {
-        if (is_null($this->coreDelegate)) {
-            throw new \LogicException('Please call Jugoya::from() and set a core delegate before build an HTTP Application.');
-        }
-
-        $coreDelegate = $this->resolveDelegate($this->coreDelegate);
+        $coreDelegate = $this->delegateResolver->resolve($coreDelegateEntry);
 
         /**
          * @var MiddlewareInterface[] $middlewareQueue
          */
         $middlewareQueue = array_map(function($entry) {
             return $this->middlewareResolver->resolve($entry);
-        }, $this->middlewareEntries);
+        }, $middlewareEntries);
 
         return new HttpApplication($coreDelegate, new MiddlewarePipeline($middlewareQueue));
     }
-
-    /**
-     * @param DelegateInterface|callable $delegate
-     * @return DelegateInterface
-     */
-    private function resolveDelegate($delegate)
-    {
-        if ($delegate instanceof DelegateInterface) {
-            return $delegate;
-        }
-
-        if (is_callable($delegate)) {
-                return new CallableDelegate($delegate);
-        }
-
-        throw new \LogicException('$delegate must be one of an DelegateInterface or a callable');
-    }
-
 }

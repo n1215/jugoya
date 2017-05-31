@@ -1,6 +1,6 @@
 <?php
 
-namespace N1215\Jugoya;
+namespace N1215\Jugoya\Resolver;
 
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 

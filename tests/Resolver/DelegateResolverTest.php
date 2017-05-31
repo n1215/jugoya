@@ -1,15 +1,15 @@
 <?php
 
-namespace N1215\Jugoya;
+namespace N1215\Jugoya\Resolver;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use N1215\Jugoya\Wrapper\CallableDelegate;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class MiddlewareResolverTest extends TestCase
+class DelegateResolverTest extends TestCase
 {
 
     protected function tearDown()
@@ -18,14 +18,14 @@ class MiddlewareResolverTest extends TestCase
         \Mockery::close();
     }
 
-    public function testResolveForMiddlewareInterface()
+    public function testResolveForDelegateInterface()
     {
-        /** @var MiddlewareInterface $middleware */
-        $middleware = \Mockery::mock(MiddlewareInterface::class);
+        /** @var DelegateInterface $middleware */
+        $middleware = \Mockery::mock(DelegateInterface::class);
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
 
-        $resolver = new MiddlewareResolver($container);
+        $resolver = new DelegateResolver($container);
         $resolved = $resolver->resolve($middleware);
 
         $this->assertEquals($middleware, $resolved);
@@ -35,20 +35,20 @@ class MiddlewareResolverTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $resolver = new MiddlewareResolver($container);
+        $resolver = new DelegateResolver($container);
 
-        $callable = function(ServerRequestInterface $request, DelegateInterface $delegate) {
+        $callable = function(ServerRequestInterface $request) {
             return \Mockery::mock(ResponseInterface::class);
         };
 
         $resolved = $resolver->resolve($callable);
-        $this->assertInstanceOf(CallableMiddleware::class, $resolved);
+        $this->assertInstanceOf(CallableDelegate::class, $resolved);
     }
 
     public function testResolveByContainer()
     {
-        /** @var MiddlewareInterface $middleware */
-        $middleware = \Mockery::mock(MiddlewareInterface::class);
+        /** @var DelegateInterface $ */
+        $delegate = \Mockery::mock(DelegateInterface::class);
         $containerId = 'dummyId';
 
         /** @var ContainerInterface $container */
@@ -56,12 +56,12 @@ class MiddlewareResolverTest extends TestCase
         $container->shouldReceive('get')
             ->once()
             ->with($containerId)
-            ->andReturn($middleware);
-        $resolver = new MiddlewareResolver($container);
+            ->andReturn($delegate);
+        $resolver = new DelegateResolver($container);
 
         $resolved = $resolver->resolve($containerId);
 
-        $this->assertEquals($resolved, $middleware);
+        $this->assertEquals($resolved, $delegate);
     }
 
     /**
@@ -71,7 +71,7 @@ class MiddlewareResolverTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $resolver = new MiddlewareResolver($container);
+        $resolver = new DelegateResolver($container);
 
         $entry = 123456789;
         $resolver->resolve($entry);

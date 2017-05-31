@@ -19,17 +19,15 @@ $container = new YourContainer();
 
 
 // 2. create an application builder
-$builder = new \N1215\Jugoya\Jugoya(new \N1215\Jugoya\MiddlewareResolver($container));
-
+$builder = \N1215\Jugoya\Jugoya::fromContainer($container);
 
 // 3. build an http application
-/** @var DelegateInterface|callable $coreDelegate */
+/** @var DelegateInterface|callable|string $coreDelegate */
 $coreDelegate = new YourApplication();
 
 /** @var HttpApplication|DelegateInterface $app */
-$app = $builder
-    ->from($coreDelegate)
-    ->middleware([
+$app = $builder->build($coreDelegate, [
+
         // a callable having the same signature with PSR-15 MiddlewareInterface
         function(ServerRequestInterface $request, DelegateInterface $delegate) {
             // do stuff
@@ -40,12 +38,10 @@ $app = $builder
 
         // an instance of PSR-15 MiddlewareInterface
         new YourMiddleware(),
-    ])
-    ->middleware([
-        // a key string for a PSR-15 MiddlewareInterface in the PSR-11 Container
+
+        // a key string for an instance of PSR-15 MiddlewareInterface in the PSR-11 Container
         YourMiddleware::class,
-    ])
-    ->build();
+    ]);
 
 
 // 4. handle a PSR-7 Sever Request

@@ -30,24 +30,23 @@ class JugoyaTest extends TestCase
             ->with(FakeMiddleware::class)
             ->andReturn(new FakeMiddleware('dependency'));
 
-        $appBuilder = new Jugoya(new MiddlewareResolver($container));
+        $container->shouldReceive('get')
+            ->with(FakeDelegate::class)
+            ->andReturn(new FakeDelegate('delegate'));
 
-        $app = $appBuilder
-            ->from($coreDelegate)
-            ->middleware([
-                function(ServerRequestInterface $request, DelegateInterface $delegate) {
-                    $response = $delegate->process($request);
-                    $body = $response->getBody();
-                    $body->seek($body->getSize());
-                    $body->write(PHP_EOL . 'callable');
-                    return $response;
-                },
-                new FakeMiddleware('object'),
-            ])
-            ->middleware([
-                FakeMiddleware::class,
-            ])
-            ->build();
+        $appBuilder = Jugoya::fromContainer($container);
+
+        $app = $appBuilder->build($coreDelegate, [
+            function(ServerRequestInterface $request, DelegateInterface $delegate) {
+                $response = $delegate->process($request);
+                $body = $response->getBody();
+                $body->seek($body->getSize());
+                $body->write(PHP_EOL . 'callable');
+                return $response;
+            },
+            new FakeMiddleware('object'),
+            FakeMiddleware::class,
+        ]);
 
         $this->assertInstanceOf(HttpApplication::class, $app);
 
@@ -65,35 +64,18 @@ class JugoyaTest extends TestCase
 
             [function(ServerRequestInterface $request) {
                 return new TextResponse('delegate');
-            }]
+            }],
+
+            [FakeDelegate::class],
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testBuildThrowsExceptionWhenCalledBeforeSettingCoreDelegate()
+    public function testFromContainer()
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-
-        $appBuilder = new Jugoya(new MiddlewareResolver($container));
-
-        $appBuilder->build();
-    }
-
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testBuildThrowsExceptionForInvalidCoreDelegate()
-    {
-        /** @var ContainerInterface $container */
-        $container = \Mockery::mock(ContainerInterface::class);
-        $appBuilder = new Jugoya(new MiddlewareResolver($container));
-        $coreDelegate = new \stdClass();
-
-        $appBuilder->from($coreDelegate)->build();
+        $appBuilder = Jugoya::fromContainer($container);
+        $this->assertInstanceOf(Jugoya::class, $appBuilder);
     }
 
 }
