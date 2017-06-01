@@ -4,9 +4,10 @@ jobs:
   build:
     docker:
       - image: circleci/php:5.6-browsers
-    working_directory: ~/laravel
+    working_directory: ~/build
     steps:
       - checkout
+      - run: curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
       - run: composer self-update
       - restore_cache:
           keys:
