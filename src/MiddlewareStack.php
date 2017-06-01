@@ -7,13 +7,13 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class MiddlewarePipeline implements MiddlewareInterface
+class MiddlewareStack implements MiddlewareInterface
 {
 
     /**
      * @var MiddlewareInterface[]
      */
-    private $queue = [];
+    private $stack = [];
 
     /**
      * @param MiddlewareInterface[] $queue
@@ -27,11 +27,11 @@ class MiddlewarePipeline implements MiddlewareInterface
 
     /**
      * @param MiddlewareInterface $middleware
-     * @return MiddlewarePipeline
+     * @return MiddlewareStack
      */
     private function add(MiddlewareInterface $middleware)
     {
-        $this->queue[] = $middleware;
+        $this->stack[] = $middleware;
         return $this;
     }
 
@@ -42,15 +42,15 @@ class MiddlewarePipeline implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        /** @var DelegateInterface $pipelineDelegate */
-        $pipelineDelegate = array_reduce(
-            array_reverse($this->queue),
+        /** @var DelegateInterface $stackDelegate */
+        $stackDelegate = array_reduce(
+            array_reverse($this->stack),
             function(DelegateInterface $delegate, MiddlewareInterface $middleware) {
                 return new MiddlewareWrappedDelegate($delegate, $middleware);
             },
             $delegate
         );
 
-        return $pipelineDelegate->process($request);
+        return $stackDelegate->process($request);
     }
 }

@@ -60,6 +60,6 @@ class HttpApplicationFactory
             return $this->middlewareResolver->resolve($entry);
         }, $middlewareEntries);
 
-        return new HttpApplication($coreDelegate, new MiddlewarePipeline($middlewareQueue));
+        return new HttpApplication($coreDelegate, new MiddlewareStack($middlewareQueue));
     }
 }

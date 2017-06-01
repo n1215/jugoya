@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequest;
 
-class MiddlewarePipelineTest extends TestCase
+class MiddlewareStackTest extends TestCase
 {
 
     protected function tearDown()
@@ -49,10 +49,10 @@ class MiddlewarePipelineTest extends TestCase
             ->andReturn(new TextResponse($delegateText));
 
 
-        $pipeline = new MiddlewarePipeline($middlewareQueue);
+        $stack = new MiddlewareStack($middlewareQueue);
 
 
-        $response = $pipeline->process($request, $delegate);
+        $response = $stack->process($request, $delegate);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertEquals(join(PHP_EOL, $expectedContent), $response->getBody()->__toString());

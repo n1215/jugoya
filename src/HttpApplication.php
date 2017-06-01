@@ -15,18 +15,18 @@ class HttpApplication implements DelegateInterface
     private $coreDelegate;
 
     /**
-     * @var MiddlewarePipeline
+     * @var MiddlewareStack
      */
-    private $middlewarePipeline;
+    private $middlewareStack;
 
     /**
      * @param DelegateInterface $coreDelegate
-     * @param MiddlewarePipeline $middlewarePipeline
+     * @param MiddlewareStack $middlewareStack
      */
-    public function __construct(DelegateInterface $coreDelegate, MiddlewarePipeline $middlewarePipeline)
+    public function __construct(DelegateInterface $coreDelegate, MiddlewareStack $middlewareStack)
     {
         $this->coreDelegate = $coreDelegate;
-        $this->middlewarePipeline = $middlewarePipeline;
+        $this->middlewareStack = $middlewareStack;
     }
 
     /**
@@ -35,6 +35,6 @@ class HttpApplication implements DelegateInterface
      */
     public function process(ServerRequestInterface $request)
     {
-        return $this->middlewarePipeline->process($request, $this->coreDelegate);
+        return $this->middlewareStack->process($request, $this->coreDelegate);
     }
 }

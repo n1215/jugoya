@@ -24,14 +24,14 @@ class HttpApplicationTest extends TestCase
         $request = \Mockery::mock(ServerRequestInterface::class);
         /** @var ResponseInterface $response */
         $response = \Mockery::mock(ResponseInterface::class);
-        /** @var MiddlewarePipeline $pipeline */
-        $pipeline = \Mockery::mock(MiddlewarePipeline::class);
-        $pipeline->shouldReceive('process')
+        /** @var MiddlewareStack $stack */
+        $stack = \Mockery::mock(MiddlewareStack::class);
+        $stack->shouldReceive('process')
             ->once()
             ->with($request, $delegate)
             ->andReturn($response);
 
-        $app = new HttpApplication($delegate, $pipeline);
+        $app = new HttpApplication($delegate, $stack);
 
         $result = $app->process($request);
         $this->assertEquals($response, $result);
