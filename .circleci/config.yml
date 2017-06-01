@@ -7,7 +7,7 @@ jobs:
     working_directory: ~/build
     steps:
       - checkout
-      - run: curl -sS https://getcomposer.org/installer | php -- --install-dir=~/build --filename=composer
+      - run: curl -sS https://getcomposer.org/installer | php -- --filename=composer
       - run: php composer self-update
       - restore_cache:
           keys:
