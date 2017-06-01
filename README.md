@@ -1,5 +1,5 @@
 # Jugoya（十五夜）🌕
-A PSR-15 HTTP application builder.
+A simple PSR-15 HTTP application factory.
 
 [![Latest Stable Version](https://poser.pugx.org/n1215/jugoya/v/stable)](https://packagist.org/packages/n1215/jugoya)
 [![License](https://poser.pugx.org/n1215/jugoya/license)](https://packagist.org/packages/n1215/jugoya)
@@ -18,10 +18,10 @@ $container = new YourContainer();
 //
 
 
-// 2. create an application builder
-$builder = \N1215\Jugoya\Jugoya::fromContainer($container);
+// 2. create an application factory
+$factory = \N1215\Jugoya\HttpApplicationFactory::fromContainer($container);
 
-// 3. build an http application
+// 3. create an http application
 /**
  * You can use one of
  *   * an instance of PSR-15 DelegateInterface
@@ -34,7 +34,7 @@ $builder = \N1215\Jugoya\Jugoya::fromContainer($container);
 $coreDelegate = new YourApplication();
 
 /** @var HttpApplication|DelegateInterface $app */
-$app = $builder->build($coreDelegate, [
+$app = $factory->create($coreDelegate, [
 
         // You can use instances of PSR-15 MiddlewareInterface
         new YourMiddleware(),

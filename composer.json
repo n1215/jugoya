@@ -1,9 +1,10 @@
 {
     "name": "n1215/jugoya",
-    "description": "A PSR-15 HTTP application builder.",
+    "description": "A simple PSR-15 HTTP application factory.",
     "keywords": [
         "psr-15",
-        "middleware"
+        "middleware",
+        "middleware dispatcher"
     ],
     "type": "library",
     "homepage": "https://github.com/n1215/jugoya",

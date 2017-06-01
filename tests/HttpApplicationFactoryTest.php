@@ -22,7 +22,7 @@ class JugoyaTest extends TestCase
      * @param DelegateInterface|callable $coreDelegate
      * @dataProvider dataProviderCoreDelegate
      */
-    public function testBuild($coreDelegate)
+    public function testCreate($coreDelegate)
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
@@ -34,9 +34,9 @@ class JugoyaTest extends TestCase
             ->with(FakeDelegate::class)
             ->andReturn(new FakeDelegate('delegate'));
 
-        $appBuilder = Jugoya::fromContainer($container);
+        $factory = HttpApplicationFactory::fromContainer($container);
 
-        $app = $appBuilder->build($coreDelegate, [
+        $app = $factory->create($coreDelegate, [
             function(ServerRequestInterface $request, DelegateInterface $delegate) {
                 $response = $delegate->process($request);
                 $body = $response->getBody();
@@ -74,8 +74,8 @@ class JugoyaTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $appBuilder = Jugoya::fromContainer($container);
-        $this->assertInstanceOf(Jugoya::class, $appBuilder);
+        $factory = HttpApplicationFactory::fromContainer($container);
+        $this->assertInstanceOf(HttpApplicationFactory::class, $factory);
     }
 
 }

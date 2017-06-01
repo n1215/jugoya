@@ -10,7 +10,7 @@ use N1215\Jugoya\Resolver\MiddlewareResolver;
 use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
 use Psr\Container\ContainerInterface;
 
-class Jugoya
+class HttpApplicationFactory
 {
 
     /**
@@ -49,7 +49,7 @@ class Jugoya
      * @param MiddlewareInterface[]|callable[]|string[] $middlewareEntries
      * @return HttpApplication
      */
-    public function build($coreDelegateEntry, array $middlewareEntries)
+    public function create($coreDelegateEntry, array $middlewareEntries)
     {
         $coreDelegate = $this->delegateResolver->resolve($coreDelegateEntry);
 
