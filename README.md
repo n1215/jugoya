@@ -1,5 +1,4 @@
 # Jugoya（十五夜）🌕
-A simple PSR-15 HTTP application factory.
 
 [![Latest Stable Version](https://poser.pugx.org/n1215/jugoya/v/stable)](https://packagist.org/packages/n1215/jugoya)
 [![License](https://poser.pugx.org/n1215/jugoya/license)](https://packagist.org/packages/n1215/jugoya)
@@ -7,7 +6,23 @@ A simple PSR-15 HTTP application factory.
 [![Code Coverage](https://scrutinizer-ci.com/g/n1215/jugoya/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/n1215/jugoya/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/n1215/jugoya/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/n1215/jugoya/?branch=master)
 
-# Example
+A simple HTTP application factory using PSR-15 HTTP Server Middleware.
+
+> Jugoya is the Japanese full moon festival on the 15th day of the eighth month of the traditional Japanese calendar.
+
+# PSR-15 HTTP Server Middleware
+
+![psr15_middleware](doc/psr15_middleware.png)
+
+See [php-fig/fig-standards](https://github.com/php-fig/fig-standards/blob/master/proposed/http-middleware/middleware.md)
+
+
+# What Jugoya do
+Jugoya create new instance of DelegateInterface from a instance of DelegateInterface and instances of MiddlewareInterface.
+![composition](doc/composition.png)
+
+
+# Code Example
 
 ```php
 // 1. register delegate and middleware dependencies to the PSR-11 Container
