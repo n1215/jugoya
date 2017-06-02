@@ -54,12 +54,12 @@ class HttpApplicationFactory
         $coreDelegate = $this->delegateResolver->resolve($coreDelegateEntry);
 
         /**
-         * @var MiddlewareInterface[] $middlewareQueue
+         * @var MiddlewareInterface[] $middlewareStack
          */
-        $middlewareQueue = array_map(function($entry) {
+        $middlewareStack = array_map(function($entry) {
             return $this->middlewareResolver->resolve($entry);
         }, $middlewareEntries);
 
-        return new HttpApplication($coreDelegate, new MiddlewareStack($middlewareQueue));
+        return new HttpApplication($coreDelegate, $middlewareStack);
     }
 }

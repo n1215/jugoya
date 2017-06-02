@@ -18,7 +18,7 @@ See [php-fig/fig-standards](https://github.com/php-fig/fig-standards/blob/master
 
 
 # What Jugoya do
-Jugoya create new instance of DelegateInterface from a instance of DelegateInterface and instances of MiddlewareInterface.
+Jugoya create a new instance of DelegateInterface from a instance of DelegateInterface and instances of MiddlewareInterface.
 ![composition](doc/composition.png)
 
 
