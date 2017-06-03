@@ -4,11 +4,25 @@ namespace N1215\Jugoya\Resolver;
 
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use N1215\Jugoya\Wrapper\CallableMiddleware;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Container\ContainerExceptionInterface;
 
 class MiddlewareResolver implements MiddlewareResolverInterface
 {
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @param string|callable|MiddlewareInterface $ref
