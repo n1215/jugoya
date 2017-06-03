@@ -8,8 +8,9 @@ interface DelegateResolverInterface
 {
 
     /**
-     * @param string|callable|MiddlewareInterface
+     * @param string|callable|DelegateInterface $ref
      * @return DelegateInterface
+     * @throws UnresolvedException
      */
-    public function resolve($entry);
+    public function resolve($ref);
 }

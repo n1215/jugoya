@@ -8,8 +8,9 @@ interface MiddlewareResolverInterface
 {
 
     /**
-     * @param string|callable|MiddlewareInterface
+     * @param string|callable|MiddlewareInterface $ref
      * @return MiddlewareInterface
+     * @throws UnresolvedException
      */
-    public function resolve($entry);
+    public function resolve($ref);
 }

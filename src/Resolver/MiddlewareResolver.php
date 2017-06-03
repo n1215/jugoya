@@ -4,42 +4,17 @@ namespace N1215\Jugoya\Resolver;
 
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use N1215\Jugoya\Wrapper\CallableMiddleware;
-use Psr\Container\ContainerInterface;
 
-class MiddlewareResolver implements MiddlewareResolverInterface
+class MiddlewareResolver extends ResolverAbstract implements MiddlewareResolverInterface
 {
 
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @param string|callable|MiddlewareInterface $entry
+     * @param string|callable|MiddlewareInterface $ref
      * @return MiddlewareInterface
+     * @throws UnresolvedException
      */
-    public function resolve($entry)
+    public function resolve($ref)
     {
-        if ($entry instanceof MiddlewareInterface) {
-            return $entry;
-        }
-
-        if (is_callable($entry)) {
-            return new CallableMiddleware($entry);
-        }
-
-        if (!is_string($entry)) {
-            throw new \InvalidArgumentException('$entry must be one of a MiddlewareInterface, a callable or string');
-        }
-
-        return $this->container->get($entry);
+        return $this->resolveWithType($ref, MiddlewareInterface::class, CallableMiddleware::class);
     }
 }
