@@ -79,7 +79,7 @@ class DelegateResolverTest extends TestCase
 
     /**
      * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
-     * @expectedExceptionMessage Could not found an entry from the container.
+     * @expectedExceptionCode 1
      */
     public function testResolveFailureWhenEntryNotFound()
     {
@@ -99,7 +99,7 @@ class DelegateResolverTest extends TestCase
 
     /**
      * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
-     * @expectedExceptionMessage Something wrong with the container.
+     * @expectedExceptionCode 2
      */
     public function testResolveFailureWhenContainerException()
     {
@@ -119,7 +119,7 @@ class DelegateResolverTest extends TestCase
 
     /**
      * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
-     * @expectedExceptionMessage Expected container returns an instance of Interop\Http\ServerMiddleware\DelegateInterface, stdClass given.
+     * @expectedExceptionCode 3
      */
     public function testResolveFailureWhenTypeError()
     {

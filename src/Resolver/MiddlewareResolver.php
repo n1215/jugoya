@@ -39,7 +39,7 @@ class MiddlewareResolver implements MiddlewareResolverInterface
         }
 
         if (!is_string($ref)) {
-            throw new \InvalidArgumentException("Argument 1 \$ref must be one of an instance of MiddlewareInterface, a callable or string.");
+            throw new \InvalidArgumentException('Argument 1 $ref must be one of an instance of MiddlewareInterface, a callable or string.');
         }
 
         return $this->resolveByContainer($ref, $this->container, MiddlewareInterface::class);

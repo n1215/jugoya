@@ -21,9 +21,9 @@ trait ResolverTrait
         try {
             $entry = $container->get($ref);
         } catch (NotFoundExceptionInterface $e) {
-            throw new UnresolvedException('Could not found an entry from the container.', 0, $e);
+            throw new UnresolvedException('Could not found an entry from the container.', ErrorCode::NOT_FOUND, $e);
         } catch (ContainerExceptionInterface $e) {
-            throw new UnresolvedException('Something wrong with the container.', 0, $e);
+            throw new UnresolvedException('Something wrong with the container.', ErrorCode::CONTAINER_ERROR, $e);
         }
 
         $this->assertInstanceOf($expectedClass, $entry);
@@ -42,7 +42,11 @@ trait ResolverTrait
         if ($entry instanceof $expectedClass) {
             return;
         }
+
         $type = is_object($entry) ? get_class($entry) : gettype($entry);
-        throw new UnresolvedException("Expected container returns an instance of {$expectedClass}, {$type} given.");
+        throw new UnresolvedException(
+            "Expected container returns an instance of {$expectedClass}, {$type} given.",
+            ErrorCode::TYPE_ERROR
+        );
     }
 }
