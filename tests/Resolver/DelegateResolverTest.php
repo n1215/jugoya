@@ -73,7 +73,66 @@ class DelegateResolverTest extends TestCase
         $container = \Mockery::mock(ContainerInterface::class);
         $resolver = new DelegateResolver($container);
 
-        $entry = 123456789;
-        $resolver->resolve($entry);
+        $ref = 123456789;
+        $resolver->resolve($ref);
     }
+
+    /**
+     * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
+     * @expectedExceptionMessage Could not found an entry from the container.
+     */
+    public function testResolveFailureWhenEntryNotFound()
+    {
+        $exception = new FakeNotFoundException('not found');
+
+        /** @var ContainerInterface $container */
+        $container = \Mockery::mock(ContainerInterface::class);
+        $containerId = 'dummyId';
+        $container->shouldReceive('get')
+            ->once()
+            ->with($containerId)
+            ->andThrow($exception);
+
+        $resolver = new DelegateResolver($container);
+        $resolver->resolve($containerId);
+    }
+
+    /**
+     * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
+     * @expectedExceptionMessage Something wrong with the container.
+     */
+    public function testResolveFailureWhenContainerException()
+    {
+        $exception = new FakeContainerException('container exception');
+
+        /** @var ContainerInterface $container */
+        $container = \Mockery::mock(ContainerInterface::class);
+        $containerId = 'dummyId';
+        $container->shouldReceive('get')
+            ->once()
+            ->with($containerId)
+            ->andThrow($exception);
+
+        $resolver = new DelegateResolver($container);
+        $resolver->resolve($containerId);
+    }
+
+    /**
+     * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
+     * @expectedExceptionMessage an instance of Interop\Http\ServerMiddleware\DelegateInterface
+     */
+    public function testResolveFailureWhenTypeError()
+    {
+        /** @var ContainerInterface $container */
+        $container = \Mockery::mock(ContainerInterface::class);
+        $containerId = 'dummyId';
+        $container->shouldReceive('get')
+            ->once()
+            ->with($containerId)
+            ->andReturn(new \stdClass());
+
+        $resolver = new DelegateResolver($container);
+        $resolver->resolve($containerId);
+    }
+
 }

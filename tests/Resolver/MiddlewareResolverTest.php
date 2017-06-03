@@ -74,7 +74,65 @@ class MiddlewareResolverTest extends TestCase
         $container = \Mockery::mock(ContainerInterface::class);
         $resolver = new MiddlewareResolver($container);
 
-        $entry = 123456789;
-        $resolver->resolve($entry);
+        $ref = 123456789;
+        $resolver->resolve($ref);
+    }
+
+    /**
+     * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
+     * @expectedExceptionMessage Could not found an entry from the container.
+     */
+    public function testResolveFailureWhenEntryNotFound()
+    {
+        $exception = new FakeNotFoundException('not found');
+
+        /** @var ContainerInterface $container */
+        $container = \Mockery::mock(ContainerInterface::class);
+        $containerId = 'dummyId';
+        $container->shouldReceive('get')
+            ->once()
+            ->with($containerId)
+            ->andThrow($exception);
+
+        $resolver = new MiddlewareResolver($container);
+        $resolver->resolve($containerId);
+    }
+
+    /**
+     * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
+     * @expectedExceptionMessage Something wrong with the container.
+     */
+    public function testResolveFailureWhenContainerException()
+    {
+        $exception = new FakeContainerException('container exception');
+
+        /** @var ContainerInterface $container */
+        $container = \Mockery::mock(ContainerInterface::class);
+        $containerId = 'dummyId';
+        $container->shouldReceive('get')
+            ->once()
+            ->with($containerId)
+            ->andThrow($exception);
+
+        $resolver = new MiddlewareResolver($container);
+        $resolver->resolve($containerId);
+    }
+
+    /**
+     * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
+     * @expectedExceptionMessage an instance of Interop\Http\ServerMiddleware\MiddlewareInterface
+     */
+    public function testResolveFailureWhenTypeError()
+    {
+        /** @var ContainerInterface $container */
+        $container = \Mockery::mock(ContainerInterface::class);
+        $containerId = 'dummyId';
+        $container->shouldReceive('get')
+            ->once()
+            ->with($containerId)
+            ->andReturn(new \stdClass());
+
+        $resolver = new MiddlewareResolver($container);
+        $resolver->resolve($containerId);
     }
 }
