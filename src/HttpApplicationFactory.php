@@ -45,20 +45,20 @@ class HttpApplicationFactory
     }
 
     /**
-     * @param DelegateInterface|callable|string $coreDelegateEntry
-     * @param MiddlewareInterface[]|callable[]|string[] $middlewareEntries
+     * @param DelegateInterface|callable|string $coreDelegateRef
+     * @param MiddlewareInterface[]|callable[]|string[] $middlewareRefs
      * @return HttpApplication
      */
-    public function create($coreDelegateEntry, array $middlewareEntries)
+    public function create($coreDelegateRef, array $middlewareRefs)
     {
-        $coreDelegate = $this->delegateResolver->resolve($coreDelegateEntry);
+        $coreDelegate = $this->delegateResolver->resolve($coreDelegateRef);
 
         /**
          * @var MiddlewareInterface[] $middlewareStack
          */
-        $middlewareStack = array_map(function($entry) {
-            return $this->middlewareResolver->resolve($entry);
-        }, $middlewareEntries);
+        $middlewareStack = array_map(function($ref) {
+            return $this->middlewareResolver->resolve($ref);
+        }, $middlewareRefs);
 
         return new HttpApplication($coreDelegate, $middlewareStack);
     }
