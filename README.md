@@ -17,7 +17,7 @@ A simple HTTP application factory using PSR-15 HTTP Server Middleware.
 See [php-fig/fig-standards](https://github.com/php-fig/fig-standards/blob/master/proposed/http-middleware/middleware.md)
 
 
-# What Jugoya do
+# What Jugoya does
 Jugoya create a new instance of DelegateInterface from a instance of DelegateInterface and instances of MiddlewareInterface.
 ![composition](doc/composition.png)
 
