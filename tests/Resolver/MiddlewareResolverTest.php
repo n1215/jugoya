@@ -120,7 +120,7 @@ class MiddlewareResolverTest extends TestCase
 
     /**
      * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
-     * @expectedExceptionMessage Expected container returns an instance of MiddlewareInterface, stdClass given.
+     * @expectedExceptionMessage Expected container returns an instance of Interop\Http\ServerMiddleware\MiddlewareInterface, stdClass given.
      */
     public function testResolveFailureWhenTypeError()
     {
