@@ -119,7 +119,7 @@ class DelegateResolverTest extends TestCase
 
     /**
      * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
-     * @expectedExceptionMessage an instance of Interop\Http\ServerMiddleware\DelegateInterface
+     * @expectedExceptionMessage Expected container returns an instance of DelegateInterface, stdClass given.
      */
     public function testResolveFailureWhenTypeError()
     {
