@@ -10,5 +10,9 @@ build:
       - script:
         code: composer install
       - script:
-        name: echo
-        code: composer test
+        name: test & coverage
+        code: composer coverage
+      - script:
+        name: move aritfacts
+        code: mv ${WERCKER_SOURCE_DIR}/build ${WERCKER_OUTPUT_DIR}/
+
