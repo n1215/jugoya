@@ -16,5 +16,5 @@ build:
         code: composer coverage
       - script:
         name: move aritfacts
-        code: touch ${WERCKER_OUTPUT_DIR}/built && mv ./build ${WERCKER_OUTPUT_DIR}/
+        code: touch ${WERCKER_OUTPUT_DIR}/built && mv ./build/coverage.clover ${WERCKER_OUTPUT_DIR}/
 
