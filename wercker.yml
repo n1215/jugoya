@@ -6,13 +6,15 @@ build:
       tag: latest
     steps:
       - script:
+        name: composer self-update
         code: composer self-update
       - script:
+        name: composer install
         code: composer install
       - script:
         name: test & coverage
         code: composer coverage
       - script:
         name: move aritfacts
-        code: mv ${WERCKER_SOURCE_DIR}/build ${WERCKER_OUTPUT_DIR}/
+        code: touch ${WERCKER_OUTPUT_DIR}/built && mv ./build ${WERCKER_OUTPUT_DIR}/
 
