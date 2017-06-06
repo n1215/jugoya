@@ -1,0 +1,14 @@
+build:
+    box:
+      id: n1215/docker-test
+      username: $USERNAME
+      password: $PASSWORD
+      tag: latest
+    steps:
+      - script:
+        code: composer self-update
+      - script:
+        code: composer install
+      - script:
+        name: echo
+        code: composer test
