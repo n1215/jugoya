@@ -8,6 +8,7 @@ use N1215\Jugoya\Resolver\DelegateResolver;
 use N1215\Jugoya\Resolver\DelegateResolverInterface;
 use N1215\Jugoya\Resolver\MiddlewareResolver;
 use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
+use N1215\Jugoya\Resolver\UnresolvedException;
 use Psr\Container\ContainerInterface;
 
 class HttpApplicationFactory
@@ -48,6 +49,7 @@ class HttpApplicationFactory
      * @param DelegateInterface|callable|string $coreDelegateRef
      * @param MiddlewareInterface[]|callable[]|string[] $middlewareRefs
      * @return HttpApplication
+     * @throws UnresolvedException
      */
     public function create($coreDelegateRef, array $middlewareRefs)
     {
