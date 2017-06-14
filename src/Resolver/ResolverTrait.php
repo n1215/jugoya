@@ -21,12 +21,20 @@ trait ResolverTrait
         try {
             $entry = $container->get($ref);
         } catch (NotFoundExceptionInterface $e) {
-            throw new UnresolvedException('Could not found an entry from the container.', ErrorCode::NOT_FOUND, $e);
+            throw new UnresolvedException(
+                "Could not found an entry identified by '{$ref}' from the container.",
+                ErrorCode::NOT_FOUND,
+                $e
+            );
         } catch (ContainerExceptionInterface $e) {
-            throw new UnresolvedException('Something wrong with the container.', ErrorCode::CONTAINER_ERROR, $e);
+            throw new UnresolvedException(
+                "Something went wrong with the container when trying to get an entry identified by '{$ref}'.",
+                ErrorCode::CONTAINER_ERROR,
+                $e
+            );
         }
 
-        $this->assertInstanceOf($expectedClass, $entry);
+        $this->assertInstanceOf($expectedClass, $entry, $ref);
 
         return $entry;
     }
@@ -34,10 +42,11 @@ trait ResolverTrait
     /**
      * @param string $expectedClass
      * @param mixed $entry
+     * @param string $ref
      * @return void
      * @throws UnresolvedException
      */
-    private function assertInstanceOf($expectedClass, $entry)
+    private function assertInstanceOf($expectedClass, $entry, $ref)
     {
         if ($entry instanceof $expectedClass) {
             return;
@@ -45,7 +54,7 @@ trait ResolverTrait
 
         $type = is_object($entry) ? get_class($entry) : gettype($entry);
         throw new UnresolvedException(
-            "Expected container returns an instance of {$expectedClass}, {$type} given.",
+            "Expected container returns an instance of {$expectedClass}, {$type} given. id='{$ref}'.",
             ErrorCode::TYPE_ERROR
         );
     }
