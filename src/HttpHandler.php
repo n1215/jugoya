@@ -2,18 +2,16 @@
 
 namespace N1215\Jugoya;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class HttpApplication implements DelegateInterface
+class HttpHandler implements HandlerInterface
 {
 
     /**
-     * @var DelegateInterface
+     * @var HandlerInterface
      */
-    private $coreDelegate;
+    private $coreHandler;
 
     /**
      * @var MiddlewareInterface[]
@@ -21,12 +19,12 @@ class HttpApplication implements DelegateInterface
     private $middlewareStack = [];
 
     /**
-     * @param DelegateInterface $coreDelegate
+     * @param HandlerInterface $coreHandler
      * @param MiddlewareInterface[] $middlewareStack
      */
-    public function __construct(DelegateInterface $coreDelegate, array $middlewareStack)
+    public function __construct(HandlerInterface $coreHandler, array $middlewareStack)
     {
-        $this->coreDelegate = $coreDelegate;
+        $this->coreHandler = $coreHandler;
 
         foreach ($middlewareStack as $middleware) {
             $this->addMiddleware($middleware);
@@ -45,27 +43,27 @@ class HttpApplication implements DelegateInterface
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request)
+    public function __invoke(ServerRequestInterface $request)
     {
         $count = count($this->middlewareStack);
 
         if ($count === 0) {
-            return $this->coreDelegate->process($request);
+            return $this->coreHandler->__invoke($request);
         }
 
         if ($count === 1) {
-            return $this->middlewareStack[0]->process($request, $this->coreDelegate);
+            return $this->middlewareStack[0]->process($request, $this->coreHandler);
         }
 
-        /** @var DelegateInterface $delegate */
-        $delegate = array_reduce(
+        /** @var HandlerInterface $handler */
+        $handler = array_reduce(
             array_reverse($this->middlewareStack),
-            function(DelegateInterface $delegate, MiddlewareInterface $middleware) {
-                return new HttpApplication($delegate, [$middleware]);
+            function(HandlerInterface $handler, MiddlewareInterface $middleware) {
+                return new HttpHandler($handler, [$middleware]);
             },
-            $this->coreDelegate
+            $this->coreHandler
         );
 
-        return $delegate->process($request);
+        return $handler->__invoke($request);
     }
 }

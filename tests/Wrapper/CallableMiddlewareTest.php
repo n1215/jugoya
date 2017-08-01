@@ -2,7 +2,7 @@
 
 namespace N1215\Jugoya\Wrapper;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
+use N1215\Jugoya\HandlerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -18,8 +18,8 @@ class CallableMiddlewareTest extends TestCase
 
     public function testProcess()
     {
-        $callable = function(ServerRequestInterface $request, DelegateInterface $delegate) {
-            return $delegate->process($request);
+        $callable = function(ServerRequestInterface $request, HandlerInterface $delegate) {
+            return $delegate->__invoke($request);
         };
 
         $middleware = new CallableMiddleware($callable);
@@ -28,9 +28,9 @@ class CallableMiddlewareTest extends TestCase
         $request = \Mockery::mock(ServerRequestInterface::class);
         /** @var ResponseInterface $response */
         $response = \Mockery::mock(ResponseInterface::class);
-        /** @var DelegateInterface $delegate */
-        $delegate = \Mockery::mock(DelegateInterface::class);
-        $delegate->shouldReceive('process')
+        /** @var HandlerInterface $delegate */
+        $delegate = \Mockery::mock(HandlerInterface::class);
+        $delegate->shouldReceive('__invoke')
             ->once()
             ->with($request)
             ->andReturn($response);
@@ -44,7 +44,7 @@ class CallableMiddlewareTest extends TestCase
      */
     public function testProcessThrowsException()
     {
-        $callable = function(ServerRequestInterface $request, DelegateInterface $delegate) {
+        $callable = function(ServerRequestInterface $request, HandlerInterface $delegate) {
             return 'not a response';
         };
 
@@ -52,8 +52,8 @@ class CallableMiddlewareTest extends TestCase
 
         /** @var ServerRequestInterface $request */
         $request = \Mockery::mock(ServerRequestInterface::class);
-        /** @var DelegateInterface $delegate */
-        $delegate = \Mockery::mock(DelegateInterface::class);
+        /** @var HandlerInterface $delegate */
+        $delegate = \Mockery::mock(HandlerInterface::class);
         $middleware->process($request, $delegate);
     }
 }

@@ -2,15 +2,13 @@
 
 namespace N1215\Jugoya;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequest;
 
-class HttpApplicationTest extends TestCase
+class HttpHandlerTest extends TestCase
 {
 
     protected function tearDown()
@@ -39,9 +37,9 @@ class HttpApplicationTest extends TestCase
         array_unshift($expectedContent, $delegateText);
 
 
-        /** @var DelegateInterface $delegate */
-        $delegate = \Mockery::mock(DelegateInterface::class);
-        $delegate->shouldReceive('process')
+        /** @var HandlerInterface $coreHandler */
+        $coreHandler = \Mockery::mock(HandlerInterface::class);
+        $coreHandler->shouldReceive('__invoke')
             ->with(\Mockery::on(function (ServerRequestInterface $request) use ($expectedAttribute){
                 // check Request modification by middleware
                 $attribute = $request->getAttribute(FakeMiddleware::ATTRIBUTE_KEY);
@@ -50,9 +48,9 @@ class HttpApplicationTest extends TestCase
             ->andReturn(new TextResponse($delegateText));
 
 
-        $app = new HttpApplication($delegate, $middlewareStack);
+        $app = new HttpHandler($coreHandler, $middlewareStack);
 
-        $response = $app->process($request);
+        $response = $app->__invoke($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertEquals(join(PHP_EOL, $expectedContent), $response->getBody()->__toString());
@@ -66,15 +64,15 @@ class HttpApplicationTest extends TestCase
         /** @var ResponseInterface $response */
         $response = \Mockery::mock(ResponseInterface::class);
 
-        /** @var DelegateInterface $delegate */
-        $delegate = \Mockery::mock(DelegateInterface::class);
-        $delegate->shouldReceive('process')
+        /** @var HandlerInterface $coreHandler */
+        $coreHandler = \Mockery::mock(HandlerInterface::class);
+        $coreHandler->shouldReceive('__invoke')
             ->once()
             ->with($request)
             ->andReturn($response);
 
-        $app = new HttpApplication($delegate, []);
-        $result = $app->process($request);
+        $app = new HttpHandler($coreHandler, []);
+        $result = $app->__invoke($request);
 
         $this->assertEquals($response, $result);
     }
@@ -87,18 +85,18 @@ class HttpApplicationTest extends TestCase
         /** @var ResponseInterface $response */
         $response = \Mockery::mock(ResponseInterface::class);
 
-        /** @var DelegateInterface $delegate */
-        $delegate = \Mockery::mock(DelegateInterface::class);
+        /** @var HandlerInterface $coreHandler */
+        $coreHandler = \Mockery::mock(HandlerInterface::class);
 
         /** @var MiddlewareInterface $middleware */
         $middleware = \Mockery::mock(MiddlewareInterface::class);
         $middleware->shouldReceive('process')
             ->once()
-            ->with($request, $delegate)
+            ->with($request, $coreHandler)
             ->andReturn($response);
 
-        $app = new HttpApplication($delegate, [$middleware]);
-        $result = $app->process($request);
+        $app = new HttpHandler($coreHandler, [$middleware]);
+        $result = $app->__invoke($request);
 
         $this->assertEquals($response, $result);
     }

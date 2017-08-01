@@ -2,14 +2,14 @@
 
 namespace N1215\Jugoya\Resolver;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use N1215\Jugoya\Wrapper\CallableDelegate;
+use N1215\Jugoya\HandlerInterface;
+use N1215\Jugoya\Wrapper\CallableHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class DelegateResolverTest extends TestCase
+class HandlerResolverTest extends TestCase
 {
 
     protected function tearDown()
@@ -18,37 +18,37 @@ class DelegateResolverTest extends TestCase
         \Mockery::close();
     }
 
-    public function testResolveForDelegateInterface()
+    public function testResolveForHandlerInterface()
     {
-        /** @var DelegateInterface $middleware */
-        $middleware = \Mockery::mock(DelegateInterface::class);
+        /** @var HandlerInterface $handler */
+        $handler = \Mockery::mock(HandlerInterface::class);
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
 
-        $resolver = new DelegateResolver($container);
-        $resolved = $resolver->resolve($middleware);
+        $resolver = new HandlerResolver($container);
+        $resolved = $resolver->resolve($handler);
 
-        $this->assertEquals($middleware, $resolved);
+        $this->assertEquals($handler, $resolved);
     }
 
     public function testResolveForCallable()
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $resolver = new DelegateResolver($container);
+        $resolver = new HandlerResolver($container);
 
         $callable = function(ServerRequestInterface $request) {
             return \Mockery::mock(ResponseInterface::class);
         };
 
         $resolved = $resolver->resolve($callable);
-        $this->assertInstanceOf(CallableDelegate::class, $resolved);
+        $this->assertInstanceOf(CallableHandler::class, $resolved);
     }
 
     public function testResolveByContainer()
     {
-        /** @var DelegateInterface $ */
-        $delegate = \Mockery::mock(DelegateInterface::class);
+        /** @var HandlerInterface $handler */
+        $handler = \Mockery::mock(HandlerInterface::class);
         $containerId = 'dummyId';
 
         /** @var ContainerInterface $container */
@@ -56,12 +56,12 @@ class DelegateResolverTest extends TestCase
         $container->shouldReceive('get')
             ->once()
             ->with($containerId)
-            ->andReturn($delegate);
-        $resolver = new DelegateResolver($container);
+            ->andReturn($handler);
+        $resolver = new HandlerResolver($container);
 
         $resolved = $resolver->resolve($containerId);
 
-        $this->assertEquals($resolved, $delegate);
+        $this->assertEquals($resolved, $handler);
     }
 
     /**
@@ -71,7 +71,7 @@ class DelegateResolverTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $resolver = new DelegateResolver($container);
+        $resolver = new HandlerResolver($container);
 
         $ref = 123456789;
         $resolver->resolve($ref);
@@ -93,7 +93,7 @@ class DelegateResolverTest extends TestCase
             ->with($containerId)
             ->andThrow($exception);
 
-        $resolver = new DelegateResolver($container);
+        $resolver = new HandlerResolver($container);
         $resolver->resolve($containerId);
     }
 
@@ -113,7 +113,7 @@ class DelegateResolverTest extends TestCase
             ->with($containerId)
             ->andThrow($exception);
 
-        $resolver = new DelegateResolver($container);
+        $resolver = new HandlerResolver($container);
         $resolver->resolve($containerId);
     }
 
@@ -131,7 +131,7 @@ class DelegateResolverTest extends TestCase
             ->with($containerId)
             ->andReturn(new \stdClass());
 
-        $resolver = new DelegateResolver($container);
+        $resolver = new HandlerResolver($container);
         $resolver->resolve($containerId);
     }
 

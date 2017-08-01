@@ -2,14 +2,13 @@
 
 namespace N1215\Jugoya;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequest;
 
-class JugoyaTest extends TestCase
+class HttpHandlerFactoryTest extends TestCase
 {
 
     protected function tearDown()
@@ -19,10 +18,10 @@ class JugoyaTest extends TestCase
     }
 
     /**
-     * @param DelegateInterface|callable $coreDelegate
-     * @dataProvider dataProviderCoreDelegate
+     * @param HandlerInterface|callable $coreHandler
+     * @dataProvider dataProviderCoreHandler
      */
-    public function testCreate($coreDelegate)
+    public function testCreate($coreHandler)
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
@@ -31,14 +30,14 @@ class JugoyaTest extends TestCase
             ->andReturn(new FakeMiddleware('dependency'));
 
         $container->shouldReceive('get')
-            ->with(FakeDelegate::class)
-            ->andReturn(new FakeDelegate('delegate'));
+            ->with(FakeHandler::class)
+            ->andReturn(new FakeHandler('handler'));
 
-        $factory = HttpApplicationFactory::fromContainer($container);
+        $factory = HttpHandlerFactory::fromContainer($container);
 
-        $app = $factory->create($coreDelegate, [
-            function(ServerRequestInterface $request, DelegateInterface $delegate) {
-                $response = $delegate->process($request);
+        $app = $factory->create($coreHandler, [
+            function(ServerRequestInterface $request, HandlerInterface $delegate) {
+                $response = $delegate->__invoke($request);
                 $body = $response->getBody();
                 $body->seek($body->getSize());
                 $body->write(PHP_EOL . 'callable');
@@ -48,25 +47,25 @@ class JugoyaTest extends TestCase
             FakeMiddleware::class,
         ]);
 
-        $this->assertInstanceOf(HttpApplication::class, $app);
+        $this->assertInstanceOf(HttpHandler::class, $app);
 
         $request = new ServerRequest();
-        $response = $app->process($request);
+        $response = $app->__invoke($request);
 
-        $expected = join(PHP_EOL, ['delegate', 'dependency', 'object', 'callable']);
+        $expected = join(PHP_EOL, ['handler', 'dependency', 'object', 'callable']);
         $this->assertEquals($expected, $response->getBody()->__toString());
     }
 
-    public function dataProviderCoreDelegate()
+    public function dataProviderCoreHandler()
     {
         return [
-            [new FakeDelegate('delegate')],
+            [new FakeHandler('handler')],
 
             [function(ServerRequestInterface $request) {
-                return new TextResponse('delegate');
+                return new TextResponse('handler');
             }],
 
-            [FakeDelegate::class],
+            [FakeHandler::class],
         ];
     }
 
@@ -74,8 +73,8 @@ class JugoyaTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $factory = HttpApplicationFactory::fromContainer($container);
-        $this->assertInstanceOf(HttpApplicationFactory::class, $factory);
+        $factory = HttpHandlerFactory::fromContainer($container);
+        $this->assertInstanceOf(HttpHandlerFactory::class, $factory);
     }
 
 }

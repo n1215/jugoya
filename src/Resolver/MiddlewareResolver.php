@@ -2,7 +2,7 @@
 
 namespace N1215\Jugoya\Resolver;
 
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use N1215\Jugoya\MiddlewareInterface;
 use N1215\Jugoya\Wrapper\CallableMiddleware;
 use Psr\Container\ContainerInterface;
 

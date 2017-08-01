@@ -2,8 +2,8 @@
 
 namespace N1215\Jugoya\Wrapper;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use N1215\Jugoya\HandlerInterface;
+use N1215\Jugoya\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -25,10 +25,10 @@ class CallableMiddleware implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param DelegateInterface $delegate
+     * @param HandlerInterface $delegate
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function process(ServerRequestInterface $request, HandlerInterface $delegate)
     {
         $response = call_user_func($this->callable, $request, $delegate);
 

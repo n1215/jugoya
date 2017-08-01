@@ -18,7 +18,7 @@ See [php-fig/fig-standards](https://github.com/php-fig/fig-standards/blob/master
 
 
 # What Jugoya does
-Jugoya create a new instance of DelegateInterface from a instance of DelegateInterface and instances of MiddlewareInterface.
+Jugoya create a new instance of HandlerInterface from a instance of HandlerInterface and instances of MiddlewareInterface.
 ![composition](doc/composition.png)
 
 
@@ -34,30 +34,30 @@ $container = new YourContainer();
 
 
 // 2. create a factory
-$factory = \N1215\Jugoya\HttpApplicationFactory::fromContainer($container);
+$factory = \N1215\Jugoya\HttpHandlerFactory::fromContainer($container);
 
 // 3. create an application
 /**
  * You can use one of
- *   * an instance of PSR-15 DelegateInterface
- *   * a callable having the same signature with PSR-15 DelegateInterface
- *   * a string identifier of a PSR-15 DelegateInterface instance in the PSR-11 Container
+ *   * an instance of PSR-15 HandlerInterface
+ *   * a callable having the same signature with PSR-15 HandlerInterface
+ *   * a string identifier of a PSR-15 HandlerInterface instance in the PSR-11 Container
  *
- * @var DelegateInterface|callable|string $coreDelegate
+ * @var HandlerInterface|callable|string $coreHandler
  *
  */
-$coreDelegate = new YourApplication();
+$coreHandler = new YourApplication();
 
-/** @var HttpApplication|DelegateInterface $app */
-$app = $factory->create($coreDelegate, [
+/** @var HttpApplication|HandlerInterface $app */
+$app = $factory->create($coreHandler, [
 
         // You can use instances of PSR-15 MiddlewareInterface
         new YourMiddleware(),
 
         // or callables having the same signature with PSR-15 MiddlewareInterface
-        function(ServerRequestInterface $request, DelegateInterface $delegate) {
+        function(ServerRequestInterface $request, HandlerInterface $delegate) {
             // do stuff
-            $response = $delegate->process($request);
+            $response = $delegate->__invoke($request);
             // do stuff
             return $response;
         },
@@ -71,7 +71,7 @@ $app = $factory->create($coreDelegate, [
 /** @var Psr\Http\Message\ServerRequestInterface $request */
 $request = \Zend\Diactoros\ServerRequestFactory::fromGlobals();
 /** @var \Psr\Http\Message\ResponseInterface $response */
-$response = $app->process($request);
+$response = $app->__invoke($request);
 ```
 
 # License

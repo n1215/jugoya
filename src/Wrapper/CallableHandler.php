@@ -2,11 +2,11 @@
 
 namespace N1215\Jugoya\Wrapper;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
+use N1215\Jugoya\HandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class CallableDelegate implements DelegateInterface
+class CallableHandler implements HandlerInterface
 {
 
     /**
@@ -26,7 +26,7 @@ class CallableDelegate implements DelegateInterface
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request)
+    public function __invoke(ServerRequestInterface $request)
     {
         $response = call_user_func($this->callable, $request);
 

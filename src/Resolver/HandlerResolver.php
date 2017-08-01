@@ -2,11 +2,11 @@
 
 namespace N1215\Jugoya\Resolver;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use N1215\Jugoya\Wrapper\CallableDelegate;
+use N1215\Jugoya\HandlerInterface;
+use N1215\Jugoya\Wrapper\CallableHandler;
 use Psr\Container\ContainerInterface;
 
-class DelegateResolver implements DelegateResolverInterface
+class HandlerResolver implements HandlerResolverInterface
 {
     use ResolverTrait;
 
@@ -24,24 +24,24 @@ class DelegateResolver implements DelegateResolverInterface
     }
 
     /**
-     * @param string|callable|DelegateInterface $ref
-     * @return DelegateInterface
+     * @param string|callable|HandlerInterface $ref
+     * @return HandlerInterface
      * @throws UnresolvedException
      */
     public function resolve($ref)
     {
-        if ($ref instanceof DelegateInterface) {
+        if ($ref instanceof HandlerInterface) {
             return $ref;
         }
 
         if (is_callable($ref)) {
-            return new CallableDelegate($ref);
+            return new CallableHandler($ref);
         }
 
         if (!is_string($ref)) {
-            throw new \InvalidArgumentException('Argument 1 $ref must be one of an instance of DelegateInterface, a callable or string.');
+            throw new \InvalidArgumentException('Argument 1 $ref must be one of an instance of HandlerInterface, a callable or string.');
         }
 
-        return $this->resolveByContainer($ref, $this->container, DelegateInterface::class);
+        return $this->resolveByContainer($ref, $this->container, HandlerInterface::class);
     }
 }
