@@ -2,11 +2,11 @@
 
 namespace N1215\Jugoya\Resolver;
 
-use N1215\Jugoya\HandlerInterface;
+use Interop\Http\Server\RequestHandlerInterface;
 use N1215\Jugoya\Wrapper\CallableHandler;
 use Psr\Container\ContainerInterface;
 
-class HandlerResolver implements HandlerResolverInterface
+class RequestHandlerResolver implements RequestHandlerResolverInterface
 {
     use ResolverTrait;
 
@@ -24,13 +24,13 @@ class HandlerResolver implements HandlerResolverInterface
     }
 
     /**
-     * @param string|callable|HandlerInterface $ref
-     * @return HandlerInterface
+     * @param string|callable|RequestHandlerInterface $ref
+     * @return RequestHandlerInterface
      * @throws UnresolvedException
      */
     public function resolve($ref)
     {
-        if ($ref instanceof HandlerInterface) {
+        if ($ref instanceof RequestHandlerInterface) {
             return $ref;
         }
 
@@ -42,6 +42,6 @@ class HandlerResolver implements HandlerResolverInterface
             throw new \InvalidArgumentException('Argument 1 $ref must be one of an instance of HandlerInterface, a callable or string.');
         }
 
-        return $this->resolveByContainer($ref, $this->container, HandlerInterface::class);
+        return $this->resolveByContainer($ref, $this->container, RequestHandlerInterface::class);
     }
 }

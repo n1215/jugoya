@@ -17,18 +17,18 @@ class CallableHandlerTest extends TestCase
 
     public function test__invoke()
     {
-        $callable = function(ServerRequestInterface $request) {
+        $callable = function (ServerRequestInterface $request) {
             $request->getBody();
             return \Mockery::mock(ResponseInterface::class);
         };
 
-        $delegate = new CallableHandler($callable);
+        $handler = new CallableHandler($callable);
 
         /** @var ServerRequestInterface $request */
         $request = \Mockery::mock(ServerRequestInterface::class);
         $request->shouldReceive('getBody')->once();
 
-        $delegate->__invoke($request);
+        $handler->handle($request);
     }
 
     /**
@@ -40,10 +40,10 @@ class CallableHandlerTest extends TestCase
             return 'not a response';
         };
 
-        $delegate = new CallableHandler($callable);
+        $handler = new CallableHandler($callable);
 
         /** @var ServerRequestInterface $request */
         $request = \Mockery::mock(ServerRequestInterface::class);
-        $delegate->__invoke($request);
+        $handler->handle($request);
     }
 }

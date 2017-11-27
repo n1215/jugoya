@@ -2,8 +2,8 @@
 
 namespace N1215\Jugoya\Resolver;
 
-use N1215\Jugoya\HandlerInterface;
-use N1215\Jugoya\MiddlewareInterface;
+use Interop\Http\Server\MiddlewareInterface;
+use Interop\Http\Server\RequestHandlerInterface;
 use N1215\Jugoya\Wrapper\CallableMiddleware;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -38,7 +38,7 @@ class MiddlewareResolverTest extends TestCase
         $container = \Mockery::mock(ContainerInterface::class);
         $resolver = new MiddlewareResolver($container);
 
-        $callable = function(ServerRequestInterface $request, HandlerInterface $delegate) {
+        $callable = function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
             return \Mockery::mock(ResponseInterface::class);
         };
 

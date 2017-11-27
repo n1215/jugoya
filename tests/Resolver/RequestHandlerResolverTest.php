@@ -2,14 +2,14 @@
 
 namespace N1215\Jugoya\Resolver;
 
-use N1215\Jugoya\HandlerInterface;
+use Interop\Http\Server\RequestHandlerInterface;
 use N1215\Jugoya\Wrapper\CallableHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class HandlerResolverTest extends TestCase
+class RequestHandlerResolverTest extends TestCase
 {
 
     protected function tearDown()
@@ -20,12 +20,12 @@ class HandlerResolverTest extends TestCase
 
     public function testResolveForHandlerInterface()
     {
-        /** @var HandlerInterface $handler */
-        $handler = \Mockery::mock(HandlerInterface::class);
+        /** @var RequestHandlerInterface $handler */
+        $handler = \Mockery::mock(RequestHandlerInterface::class);
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
 
-        $resolver = new HandlerResolver($container);
+        $resolver = new RequestHandlerResolver($container);
         $resolved = $resolver->resolve($handler);
 
         $this->assertEquals($handler, $resolved);
@@ -35,7 +35,7 @@ class HandlerResolverTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $resolver = new HandlerResolver($container);
+        $resolver = new RequestHandlerResolver($container);
 
         $callable = function(ServerRequestInterface $request) {
             return \Mockery::mock(ResponseInterface::class);
@@ -47,8 +47,8 @@ class HandlerResolverTest extends TestCase
 
     public function testResolveByContainer()
     {
-        /** @var HandlerInterface $handler */
-        $handler = \Mockery::mock(HandlerInterface::class);
+        /** @var RequestHandlerInterface $handler */
+        $handler = \Mockery::mock(RequestHandlerInterface::class);
         $containerId = 'dummyId';
 
         /** @var ContainerInterface $container */
@@ -57,7 +57,7 @@ class HandlerResolverTest extends TestCase
             ->once()
             ->with($containerId)
             ->andReturn($handler);
-        $resolver = new HandlerResolver($container);
+        $resolver = new RequestHandlerResolver($container);
 
         $resolved = $resolver->resolve($containerId);
 
@@ -71,7 +71,7 @@ class HandlerResolverTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $resolver = new HandlerResolver($container);
+        $resolver = new RequestHandlerResolver($container);
 
         $ref = 123456789;
         $resolver->resolve($ref);
@@ -93,7 +93,7 @@ class HandlerResolverTest extends TestCase
             ->with($containerId)
             ->andThrow($exception);
 
-        $resolver = new HandlerResolver($container);
+        $resolver = new RequestHandlerResolver($container);
         $resolver->resolve($containerId);
     }
 
@@ -113,7 +113,7 @@ class HandlerResolverTest extends TestCase
             ->with($containerId)
             ->andThrow($exception);
 
-        $resolver = new HandlerResolver($container);
+        $resolver = new RequestHandlerResolver($container);
         $resolver->resolve($containerId);
     }
 
@@ -131,7 +131,7 @@ class HandlerResolverTest extends TestCase
             ->with($containerId)
             ->andReturn(new \stdClass());
 
-        $resolver = new HandlerResolver($container);
+        $resolver = new RequestHandlerResolver($container);
         $resolver->resolve($containerId);
     }
 

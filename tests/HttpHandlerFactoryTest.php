@@ -2,6 +2,7 @@
 
 namespace N1215\Jugoya;
 
+use Interop\Http\Server\RequestHandlerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -18,7 +19,7 @@ class HttpHandlerFactoryTest extends TestCase
     }
 
     /**
-     * @param HandlerInterface|callable $coreHandler
+     * @param RequestHandlerInterface|callable $coreHandler
      * @dataProvider dataProviderCoreHandler
      */
     public function testCreate($coreHandler)
@@ -33,11 +34,11 @@ class HttpHandlerFactoryTest extends TestCase
             ->with(FakeHandler::class)
             ->andReturn(new FakeHandler('handler'));
 
-        $factory = HttpHandlerFactory::fromContainer($container);
+        $factory = RequestHandlerFactory::fromContainer($container);
 
         $app = $factory->create($coreHandler, [
-            function(ServerRequestInterface $request, HandlerInterface $delegate) {
-                $response = $delegate->__invoke($request);
+            function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
+                $response = $handler->handle($request);
                 $body = $response->getBody();
                 $body->seek($body->getSize());
                 $body->write(PHP_EOL . 'callable');
@@ -47,10 +48,10 @@ class HttpHandlerFactoryTest extends TestCase
             FakeMiddleware::class,
         ]);
 
-        $this->assertInstanceOf(HttpHandler::class, $app);
+        $this->assertInstanceOf(RequestHandler::class, $app);
 
         $request = new ServerRequest();
-        $response = $app->__invoke($request);
+        $response = $app->handle($request);
 
         $expected = join(PHP_EOL, ['handler', 'dependency', 'object', 'callable']);
         $this->assertEquals($expected, $response->getBody()->__toString());
@@ -73,8 +74,7 @@ class HttpHandlerFactoryTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $factory = HttpHandlerFactory::fromContainer($container);
-        $this->assertInstanceOf(HttpHandlerFactory::class, $factory);
+        $factory = RequestHandlerFactory::fromContainer($container);
+        $this->assertInstanceOf(RequestHandlerFactory::class, $factory);
     }
-
 }

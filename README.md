@@ -25,7 +25,7 @@ Jugoya create a new instance of HandlerInterface from a instance of HandlerInter
 # Code Example
 
 ```php
-// 1. register delegate and middleware dependencies to the PSR-11 Container
+// 1. register handler and middleware dependencies to the PSR-11 Container
 /** @var \Psr\Container\ContainerInterface $container */
 $container = new YourContainer();
 //
@@ -34,30 +34,30 @@ $container = new YourContainer();
 
 
 // 2. create a factory
-$factory = \N1215\Jugoya\HttpHandlerFactory::fromContainer($container);
+$factory = \N1215\Jugoya\RequestHandlerFactory::fromContainer($container);
 
 // 3. create an application
 /**
  * You can use one of
- *   * an instance of PSR-15 HandlerInterface
- *   * a callable having the same signature with PSR-15 HandlerInterface
- *   * a string identifier of a PSR-15 HandlerInterface instance in the PSR-11 Container
+ *   * an instance of PSR-15 RequestHandlerInterface
+ *   * a callable having the same signature with PSR-15 RequestHandlerInterface
+ *   * a string identifier of a PSR-15 RequestHandlerInterface instance in the PSR-11 Container
  *
- * @var HandlerInterface|callable|string $coreHandler
+ * @var RequestHandlerInterface|callable|string $coreHandler
  *
  */
 $coreHandler = new YourApplication();
 
-/** @var HttpApplication|HandlerInterface $app */
-$app = $factory->create($coreHandler, [
+/** @var RequestHandlerInterface $handler */
+$handler = $factory->create($coreHandler, [
 
         // You can use instances of PSR-15 MiddlewareInterface
         new YourMiddleware(),
 
         // or callables having the same signature with PSR-15 MiddlewareInterface
-        function(ServerRequestInterface $request, HandlerInterface $delegate) {
+        function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
             // do stuff
-            $response = $delegate->__invoke($request);
+            $response = $handler->handle($request);
             // do stuff
             return $response;
         },
@@ -71,7 +71,7 @@ $app = $factory->create($coreHandler, [
 /** @var Psr\Http\Message\ServerRequestInterface $request */
 $request = \Zend\Diactoros\ServerRequestFactory::fromGlobals();
 /** @var \Psr\Http\Message\ResponseInterface $response */
-$response = $app->__invoke($request);
+$response = $handler->handle($request);
 ```
 
 # License

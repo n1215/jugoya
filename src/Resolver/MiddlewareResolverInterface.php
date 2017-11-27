@@ -2,7 +2,7 @@
 
 namespace N1215\Jugoya\Resolver;
 
-use N1215\Jugoya\MiddlewareInterface;
+use Interop\Http\Server\MiddlewareInterface;
 
 interface MiddlewareResolverInterface
 {

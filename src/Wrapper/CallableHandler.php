@@ -2,11 +2,11 @@
 
 namespace N1215\Jugoya\Wrapper;
 
-use N1215\Jugoya\HandlerInterface;
+use Interop\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class CallableHandler implements HandlerInterface
+class CallableHandler implements RequestHandlerInterface
 {
 
     /**
@@ -26,7 +26,7 @@ class CallableHandler implements HandlerInterface
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request)
     {
         $response = call_user_func($this->callable, $request);
 

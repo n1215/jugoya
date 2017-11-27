@@ -2,18 +2,20 @@
 
 namespace N1215\Jugoya;
 
-use N1215\Jugoya\Resolver\HandlerResolver;
-use N1215\Jugoya\Resolver\HandlerResolverInterface;
+use Interop\Http\Server\MiddlewareInterface;
+use Interop\Http\Server\RequestHandlerInterface;
+use N1215\Jugoya\Resolver\RequestHandlerResolver;
+use N1215\Jugoya\Resolver\RequestHandlerResolverInterface;
 use N1215\Jugoya\Resolver\MiddlewareResolver;
 use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
 use N1215\Jugoya\Resolver\UnresolvedException;
 use Psr\Container\ContainerInterface;
 
-class HttpHandlerFactory
+class RequestHandlerFactory
 {
 
     /**
-     * @var HandlerResolverInterface
+     * @var RequestHandlerResolverInterface
      */
     private $handlerResolver;
 
@@ -23,11 +25,11 @@ class HttpHandlerFactory
     private $middlewareResolver;
 
     /**
-     * @param HandlerResolverInterface $handlerResolver
+     * @param RequestHandlerResolverInterface $handlerResolver
      * @param MiddlewareResolverInterface $middlewareResolver
      */
     public function __construct(
-        HandlerResolverInterface $handlerResolver,
+        RequestHandlerResolverInterface $handlerResolver,
         MiddlewareResolverInterface $middlewareResolver
     ) {
         $this->handlerResolver = $handlerResolver;
@@ -40,13 +42,13 @@ class HttpHandlerFactory
      */
     public static function fromContainer(ContainerInterface $container)
     {
-        return new static(new HandlerResolver($container), new MiddlewareResolver($container));
+        return new static(new RequestHandlerResolver($container), new MiddlewareResolver($container));
     }
 
     /**
-     * @param HandlerInterface|callable|string $coreHandlerRef
+     * @param RequestHandlerInterface|callable|string $coreHandlerRef
      * @param MiddlewareInterface[]|callable[]|string[] $middlewareRefs
-     * @return HttpHandler
+     * @return RequestHandler
      * @throws UnresolvedException
      */
     public function create($coreHandlerRef, array $middlewareRefs)
@@ -60,6 +62,6 @@ class HttpHandlerFactory
             return $this->middlewareResolver->resolve($ref);
         }, $middlewareRefs);
 
-        return new HttpHandler($coreHandler, $middlewareStack);
+        return new RequestHandler($coreHandler, $middlewareStack);
     }
 }

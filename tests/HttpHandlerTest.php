@@ -2,6 +2,8 @@
 
 namespace N1215\Jugoya;
 
+use Interop\Http\Server\MiddlewareInterface;
+use Interop\Http\Server\RequestHandlerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,24 +35,24 @@ class HttpHandlerTest extends TestCase
             $expectedAttribute[] = $middlewareText;
         }
 
-        $delegateText = 'delegate';
-        array_unshift($expectedContent, $delegateText);
+        $coreText = 'core';
+        array_unshift($expectedContent, $coreText);
 
 
-        /** @var HandlerInterface $coreHandler */
-        $coreHandler = \Mockery::mock(HandlerInterface::class);
-        $coreHandler->shouldReceive('__invoke')
+        /** @var RequestHandlerInterface $coreHandler */
+        $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
+        $coreHandler->shouldReceive('handle')
             ->with(\Mockery::on(function (ServerRequestInterface $request) use ($expectedAttribute){
                 // check Request modification by middleware
                 $attribute = $request->getAttribute(FakeMiddleware::ATTRIBUTE_KEY);
                 return $attribute === join(PHP_EOL, $expectedAttribute) . PHP_EOL;
             }))
-            ->andReturn(new TextResponse($delegateText));
+            ->andReturn(new TextResponse($coreText));
 
 
-        $app = new HttpHandler($coreHandler, $middlewareStack);
+        $app = new RequestHandler($coreHandler, $middlewareStack);
 
-        $response = $app->__invoke($request);
+        $response = $app->handle($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertEquals(join(PHP_EOL, $expectedContent), $response->getBody()->__toString());
@@ -64,15 +66,15 @@ class HttpHandlerTest extends TestCase
         /** @var ResponseInterface $response */
         $response = \Mockery::mock(ResponseInterface::class);
 
-        /** @var HandlerInterface $coreHandler */
-        $coreHandler = \Mockery::mock(HandlerInterface::class);
-        $coreHandler->shouldReceive('__invoke')
+        /** @var RequestHandlerInterface $coreHandler */
+        $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
+        $coreHandler->shouldReceive('handle')
             ->once()
             ->with($request)
             ->andReturn($response);
 
-        $app = new HttpHandler($coreHandler, []);
-        $result = $app->__invoke($request);
+        $app = new RequestHandler($coreHandler, []);
+        $result = $app->handle($request);
 
         $this->assertEquals($response, $result);
     }
@@ -85,8 +87,8 @@ class HttpHandlerTest extends TestCase
         /** @var ResponseInterface $response */
         $response = \Mockery::mock(ResponseInterface::class);
 
-        /** @var HandlerInterface $coreHandler */
-        $coreHandler = \Mockery::mock(HandlerInterface::class);
+        /** @var RequestHandlerInterface $coreHandler */
+        $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
 
         /** @var MiddlewareInterface $middleware */
         $middleware = \Mockery::mock(MiddlewareInterface::class);
@@ -95,8 +97,8 @@ class HttpHandlerTest extends TestCase
             ->with($request, $coreHandler)
             ->andReturn($response);
 
-        $app = new HttpHandler($coreHandler, [$middleware]);
-        $result = $app->__invoke($request);
+        $app = new RequestHandler($coreHandler, [$middleware]);
+        $result = $app->handle($request);
 
         $this->assertEquals($response, $result);
     }

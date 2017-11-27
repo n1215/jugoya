@@ -2,8 +2,8 @@
 
 namespace N1215\Jugoya\Wrapper;
 
-use N1215\Jugoya\HandlerInterface;
-use N1215\Jugoya\MiddlewareInterface;
+use Interop\Http\Server\RequestHandlerInterface;
+use Interop\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -25,12 +25,12 @@ class CallableMiddleware implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param HandlerInterface $delegate
+     * @param RequestHandlerInterface $handler
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, HandlerInterface $delegate)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler)
     {
-        $response = call_user_func($this->callable, $request, $delegate);
+        $response = call_user_func($this->callable, $request, $handler);
 
         if (!$response instanceof ResponseInterface) {
             throw new \LogicException('callable must return an instance of \Psr\Http\Message\ResponseInterface.');

@@ -2,14 +2,16 @@
 
 namespace N1215\Jugoya;
 
+use Interop\Http\Server\MiddlewareInterface;
+use Interop\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class HttpHandler implements HandlerInterface
+class RequestHandler implements RequestHandlerInterface
 {
 
     /**
-     * @var HandlerInterface
+     * @var RequestHandlerInterface
      */
     private $coreHandler;
 
@@ -19,10 +21,10 @@ class HttpHandler implements HandlerInterface
     private $middlewareStack = [];
 
     /**
-     * @param HandlerInterface $coreHandler
+     * @param RequestHandlerInterface $coreHandler
      * @param MiddlewareInterface[] $middlewareStack
      */
-    public function __construct(HandlerInterface $coreHandler, array $middlewareStack)
+    public function __construct(RequestHandlerInterface $coreHandler, array $middlewareStack)
     {
         $this->coreHandler = $coreHandler;
 
@@ -43,27 +45,27 @@ class HttpHandler implements HandlerInterface
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request)
     {
         $count = count($this->middlewareStack);
 
         if ($count === 0) {
-            return $this->coreHandler->__invoke($request);
+            return $this->coreHandler->handle($request);
         }
 
         if ($count === 1) {
             return $this->middlewareStack[0]->process($request, $this->coreHandler);
         }
 
-        /** @var HandlerInterface $handler */
+        /** @var RequestHandlerInterface $handler */
         $handler = array_reduce(
             array_reverse($this->middlewareStack),
-            function(HandlerInterface $handler, MiddlewareInterface $middleware) {
-                return new HttpHandler($handler, [$middleware]);
+            function(RequestHandlerInterface $handler, MiddlewareInterface $middleware) {
+                return new RequestHandler($handler, [$middleware]);
             },
             $this->coreHandler
         );
 
-        return $handler->__invoke($request);
+        return $handler->handle($request);
     }
 }

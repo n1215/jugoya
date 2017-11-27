@@ -2,6 +2,8 @@
 
 namespace N1215\Jugoya;
 
+use Interop\Http\Server\MiddlewareInterface;
+use Interop\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class FakeMiddleware implements MiddlewareInterface
@@ -24,20 +26,19 @@ class FakeMiddleware implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param HandlerInterface $delegate
+     * @param RequestHandlerInterface $handler
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function process(ServerRequestInterface $request, HandlerInterface $delegate)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler)
     {
         $attribute = $request->getAttribute(self::ATTRIBUTE_KEY);
         $newRequest = $request->withAttribute(self::ATTRIBUTE_KEY, $attribute . $this->text . PHP_EOL);
 
-        $response = $delegate->__invoke($newRequest);
+        $response = $handler->handle($newRequest);
 
         $body = $response->getBody();
         $body->seek($body->getSize());
         $body->write(PHP_EOL . $this->text);
         return $response;
     }
-
 }
