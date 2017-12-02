@@ -28,7 +28,7 @@ class MiddlewareResolver implements MiddlewareResolverInterface
      * @return MiddlewareInterface
      * @throws UnresolvedException
      */
-    public function resolve($ref)
+    public function resolve($ref): MiddlewareInterface
     {
         if ($ref instanceof MiddlewareInterface) {
             return $ref;

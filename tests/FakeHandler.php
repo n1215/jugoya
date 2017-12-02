@@ -3,6 +3,7 @@
 namespace N1215\Jugoya;
 
 use Interop\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 
@@ -24,9 +25,9 @@ class FakeHandler implements RequestHandlerInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return new TextResponse($this->text);
     }

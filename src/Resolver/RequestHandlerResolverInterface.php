@@ -12,5 +12,5 @@ interface RequestHandlerResolverInterface
      * @return RequestHandlerInterface
      * @throws UnresolvedException
      */
-    public function resolve($ref);
+    public function resolve($ref): RequestHandlerInterface;
 }

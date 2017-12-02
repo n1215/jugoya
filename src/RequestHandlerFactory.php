@@ -48,10 +48,10 @@ class RequestHandlerFactory
     /**
      * @param RequestHandlerInterface|callable|string $coreHandlerRef
      * @param MiddlewareInterface[]|callable[]|string[] $middlewareRefs
-     * @return RequestHandler
+     * @return RequestHandlerInterface
      * @throws UnresolvedException
      */
-    public function create($coreHandlerRef, array $middlewareRefs)
+    public function create($coreHandlerRef, array $middlewareRefs): RequestHandlerInterface
     {
         $coreHandler = $this->handlerResolver->resolve($coreHandlerRef);
 

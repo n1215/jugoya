@@ -12,5 +12,5 @@ interface MiddlewareResolverInterface
      * @return MiddlewareInterface
      * @throws UnresolvedException
      */
-    public function resolve($ref);
+    public function resolve($ref): MiddlewareInterface;
 }
