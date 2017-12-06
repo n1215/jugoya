@@ -11,9 +11,8 @@ use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
 use N1215\Jugoya\Resolver\UnresolvedException;
 use Psr\Container\ContainerInterface;
 
-class RequestHandlerFactory
+class RequestHandlerFactory implements RequestHandlerFactoryInterface
 {
-
     /**
      * @var RequestHandlerResolverInterface
      */

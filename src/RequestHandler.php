@@ -49,23 +49,22 @@ class RequestHandler implements RequestHandlerInterface
     {
         $count = count($this->middlewareStack);
 
-        if ($count === 0) {
-            return $this->coreHandler->handle($request);
+        switch ($count) {
+            case 0:
+                return $this->coreHandler->handle($request);
+            case 1:
+                return $this->middlewareStack[0]->process($request, $this->coreHandler);
+            default:
+                /** @var RequestHandlerInterface $handler */
+                $handler = array_reduce(
+                    array_reverse($this->middlewareStack),
+                    function(RequestHandlerInterface $handler, MiddlewareInterface $middleware) {
+                        return new self($handler, [$middleware]);
+                    },
+                    $this->coreHandler
+                );
+
+                return $handler->handle($request);
         }
-
-        if ($count === 1) {
-            return $this->middlewareStack[0]->process($request, $this->coreHandler);
-        }
-
-        /** @var RequestHandlerInterface $handler */
-        $handler = array_reduce(
-            array_reverse($this->middlewareStack),
-            function(RequestHandlerInterface $handler, MiddlewareInterface $middleware) {
-                return new RequestHandler($handler, [$middleware]);
-            },
-            $this->coreHandler
-        );
-
-        return $handler->handle($request);
     }
 }

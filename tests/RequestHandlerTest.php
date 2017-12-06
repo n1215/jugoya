@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequest;
 
-class HttpHandlerTest extends TestCase
+class RequestHandlerTest extends TestCase
 {
 
     protected function tearDown()
