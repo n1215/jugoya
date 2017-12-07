@@ -6,11 +6,11 @@
 [![Code Coverage](https://scrutinizer-ci.com/g/n1215/jugoya/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/n1215/jugoya/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/n1215/jugoya/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/n1215/jugoya/?branch=master)
 
-A simple HTTP application factory using PSR-15 HTTP Server Middleware.
+A simple HTTP application builder using PSR-15 HTTP Server Handler.
 
 > Jugoya is the Japanese full moon festival on the 15th day of the eighth month of the traditional Japanese calendar.
 
-# PSR-15 HTTP Server Middleware
+# PSR-15 HTTP Server Handler and Middleware
 
 ![psr15_middleware](doc/psr15_middleware.png)
 
@@ -18,7 +18,7 @@ See [php-fig/fig-standards](https://github.com/php-fig/fig-standards/blob/master
 
 
 # What Jugoya does
-Jugoya create a new instance of HandlerInterface from a instance of HandlerInterface and instances of MiddlewareInterface.
+Jugoya create a new instance of RequestHandlerInterface from a instance of RequestHandlerInterface and instances of MiddlewareInterface.
 ![composition](doc/composition.png)
 
 
@@ -33,13 +33,13 @@ $container = new YourContainer();
 //
 
 
-// 2. create a factory
-$factory = \N1215\Jugoya\RequestHandlerFactory::fromContainer($container);
+// 2. create a builder
+$factory = \N1215\Jugoya\RequestHandlerBuilder::fromContainer($container);
 
-// LazyRequestHandlerFactory resolves handler and middleware lazily.
-// $factory = \N1215\Jugoya\LazyRequestHandlerFactory::fromContainer($container);
+// LazyRequestHandlerBuilder resolves handler and middleware lazily.
+// $factory = \N1215\Jugoya\LazyRequestHandlerBuilder::fromContainer($container);
 
-// 3. create an application
+// 3. build a request handler
 /**
  * You can use one of
  *   * an instance of PSR-15 RequestHandlerInterface
@@ -52,7 +52,7 @@ $factory = \N1215\Jugoya\RequestHandlerFactory::fromContainer($container);
 $coreHandler = new YourApplication();
 
 /** @var RequestHandlerInterface $handler */
-$handler = $factory->create($coreHandler, [
+$handler = $factory->build($coreHandler, [
 
         // You can use instances of PSR-15 MiddlewareInterface
         new YourMiddleware(),
@@ -72,7 +72,7 @@ $handler = $factory->create($coreHandler, [
 
 // 4. handle a PSR-7 Sever Request
 /** @var Psr\Http\Message\ServerRequestInterface $request */
-$request = \Zend\Diactoros\ServerRequestFactory::fromGlobals();
+$request = \Zend\Diactoros\ServerRequestBuilder::fromGlobals();
 /** @var \Psr\Http\Message\ResponseInterface $response */
 $response = $handler->handle($request);
 ```
