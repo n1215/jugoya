@@ -11,7 +11,7 @@ use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
 use N1215\Jugoya\Resolver\UnresolvedException;
 use Psr\Container\ContainerInterface;
 
-class LazyRequestHandlerFactory implements RequestHandlerFactoryInterface
+class LazyRequestHandlerBuilder implements RequestHandlerBuilderInterface
 {
     /**
      * @var RequestHandlerResolverInterface
@@ -52,7 +52,7 @@ class LazyRequestHandlerFactory implements RequestHandlerFactoryInterface
      */
     public function create($coreHandlerRef, array $middlewareRefs): RequestHandlerInterface
     {
-        return new LazyRequestHandler(
+        return new LazyDelegateHandler(
             $this->handlerResolver,
             $this->middlewareResolver,
             $coreHandlerRef,

@@ -50,7 +50,7 @@ class RequestHandlerTest extends TestCase
             ->andReturn(new TextResponse($coreText));
 
 
-        $app = new RequestHandler($coreHandler, $middlewareStack);
+        $app = new DelegateHandler($coreHandler, $middlewareStack);
 
         $response = $app->handle($request);
 
@@ -73,7 +73,7 @@ class RequestHandlerTest extends TestCase
             ->with($request)
             ->andReturn($response);
 
-        $app = new RequestHandler($coreHandler, []);
+        $app = new DelegateHandler($coreHandler, []);
         $result = $app->handle($request);
 
         $this->assertEquals($response, $result);
@@ -97,7 +97,7 @@ class RequestHandlerTest extends TestCase
             ->with($request, $coreHandler)
             ->andReturn($response);
 
-        $app = new RequestHandler($coreHandler, [$middleware]);
+        $app = new DelegateHandler($coreHandler, [$middleware]);
         $result = $app->handle($request);
 
         $this->assertEquals($response, $result);

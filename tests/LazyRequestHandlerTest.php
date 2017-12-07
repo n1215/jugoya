@@ -71,7 +71,7 @@ class LazyRequestHandlerTest extends TestCase
                 ->andReturn($middlewareStack[$index]);
         }
 
-        $app = new LazyRequestHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, $middlewareRefs);
+        $app = new LazyDelegateHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, $middlewareRefs);
 
         $response = $app->handle($request);
 
@@ -105,7 +105,7 @@ class LazyRequestHandlerTest extends TestCase
         /** @var MiddlewareResolverInterface|MockInterface $middlewareResolver */
         $middlewareResolver = \Mockery::mock(MiddlewareResolverInterface::class);
 
-        $app = new LazyRequestHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, []);
+        $app = new LazyDelegateHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, []);
         $result = $app->handle($request);
 
         $this->assertEquals($response, $result);
@@ -146,7 +146,7 @@ class LazyRequestHandlerTest extends TestCase
             ->with($middlewareRef)
             ->andReturn($middleware);
 
-        $app = new LazyRequestHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, [$middlewareRef]);
+        $app = new LazyDelegateHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, [$middlewareRef]);
 
         $response = $app->handle($request);
 

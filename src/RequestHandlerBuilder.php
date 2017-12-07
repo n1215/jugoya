@@ -11,7 +11,7 @@ use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
 use N1215\Jugoya\Resolver\UnresolvedException;
 use Psr\Container\ContainerInterface;
 
-class RequestHandlerFactory implements RequestHandlerFactoryInterface
+class RequestHandlerBuilder implements RequestHandlerBuilderInterface
 {
     /**
      * @var RequestHandlerResolverInterface
@@ -61,6 +61,6 @@ class RequestHandlerFactory implements RequestHandlerFactoryInterface
             return $this->middlewareResolver->resolve($ref);
         }, $middlewareRefs);
 
-        return new RequestHandler($coreHandler, $middlewareStack);
+        return new DelegateHandler($coreHandler, $middlewareStack);
     }
 }

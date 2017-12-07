@@ -10,7 +10,7 @@ use N1215\Jugoya\Resolver\UnresolvedException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class LazyRequestHandler implements RequestHandlerInterface
+class LazyDelegateHandler implements RequestHandlerInterface
 {
     /**
      * @var RequestHandlerResolverInterface
@@ -66,12 +66,12 @@ class LazyRequestHandler implements RequestHandlerInterface
 
         $headMiddleware = $this->middlewareResolver->resolve($this->middlewareRefs[0]);
         $tailMiddlewareRefs = array_slice($this->middlewareRefs, 1, $count - 1);
-        $innerHandler = new self(
+        $innerDelegate = new self(
             $this->handlerResolver,
             $this->middlewareResolver,
             $this->coreHandlerRef,
             $tailMiddlewareRefs
         );
-        return $headMiddleware->process($request, $innerHandler);
+        return $headMiddleware->process($request, $innerDelegate);
     }
 }

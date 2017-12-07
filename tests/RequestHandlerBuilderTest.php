@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequest;
 
-class LazyRequestHandlerFactoryTest extends TestCase
+class RequestHandlerBuilderTest extends TestCase
 {
 
     protected function tearDown()
@@ -34,7 +34,7 @@ class LazyRequestHandlerFactoryTest extends TestCase
             ->with(FakeHandler::class)
             ->andReturn(new FakeHandler('handler'));
 
-        $factory = LazyRequestHandlerFactory::fromContainer($container);
+        $factory = RequestHandlerBuilder::fromContainer($container);
 
         $app = $factory->create($coreHandler, [
             function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
@@ -48,7 +48,7 @@ class LazyRequestHandlerFactoryTest extends TestCase
             FakeMiddleware::class,
         ]);
 
-        $this->assertInstanceOf(LazyRequestHandler::class, $app);
+        $this->assertInstanceOf(DelegateHandler::class, $app);
 
         $request = new ServerRequest();
         $response = $app->handle($request);
@@ -74,7 +74,7 @@ class LazyRequestHandlerFactoryTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = \Mockery::mock(ContainerInterface::class);
-        $factory = LazyRequestHandlerFactory::fromContainer($container);
-        $this->assertInstanceOf(LazyRequestHandlerFactory::class, $factory);
+        $factory = RequestHandlerBuilder::fromContainer($container);
+        $this->assertInstanceOf(RequestHandlerBuilder::class, $factory);
     }
 }
