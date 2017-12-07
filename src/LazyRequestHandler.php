@@ -59,25 +59,19 @@ class LazyRequestHandler implements RequestHandlerInterface
     {
         $count = count($this->middlewareRefs);
 
-        $coreHandler = $this->handlerResolver->resolve($this->coreHandlerRef);
-        switch ($count) {
-            case 0:
-                return $coreHandler->handle($request);
-
-            case 1:
-                $middleware = $this->middlewareResolver->resolve($this->middlewareRefs[0]);
-                return $middleware->process($request, $coreHandler);
-
-            default:
-                $headMiddleware = $this->middlewareResolver->resolve($this->middlewareRefs[0]);
-                $tailMiddlewareRefs = array_slice($this->middlewareRefs, 1, $count - 1);
-                $innerHandler = new self(
-                    $this->handlerResolver,
-                    $this->middlewareResolver,
-                    $coreHandler,
-                    $tailMiddlewareRefs
-                );
-                return $headMiddleware->process($request, $innerHandler);
+        if ($count === 0) {
+            $coreHandler = $this->handlerResolver->resolve($this->coreHandlerRef);
+            return $coreHandler->handle($request);
         }
+
+        $headMiddleware = $this->middlewareResolver->resolve($this->middlewareRefs[0]);
+        $tailMiddlewareRefs = array_slice($this->middlewareRefs, 1, $count - 1);
+        $innerHandler = new self(
+            $this->handlerResolver,
+            $this->middlewareResolver,
+            $this->coreHandlerRef,
+            $tailMiddlewareRefs
+        );
+        return $headMiddleware->process($request, $innerHandler);
     }
 }

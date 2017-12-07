@@ -62,10 +62,6 @@ class LazyRequestHandlerTest extends TestCase
             ->once()
             ->andReturn($coreHandler);
 
-        $handlerResolver->shouldReceive('resolve')
-            ->with($coreHandler)
-            ->andReturn($coreHandler);
-
         /** @var MiddlewareResolverInterface|MockInterface $middlewareResolver */
         $middlewareResolver = \Mockery::mock(MiddlewareResolverInterface::class);
         foreach(range(0, $middlewareCount - 1) as $index) {
@@ -117,14 +113,23 @@ class LazyRequestHandlerTest extends TestCase
 
     public function testProcessWithSingleStack()
     {
-        /** @var ServerRequestInterface $request */
-        $request = \Mockery::mock(ServerRequestInterface::class);
+        $request = new ServerRequest();
 
-        /** @var ResponseInterface $response */
-        $response = \Mockery::mock(ResponseInterface::class);
+        $middlewareText = 'middleware';
+        $middleware = new FakeMiddleware($middlewareText);
+        $middlewareRef = 'middlewareRef';
+
+        $coreText = 'core';
 
         /** @var RequestHandlerInterface $coreHandler */
         $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
+        $coreHandler->shouldReceive('handle')
+            ->with(\Mockery::on(function (ServerRequestInterface $request) use ($middlewareText){
+                // check Request modification by middleware
+                $attribute = $request->getAttribute(FakeMiddleware::ATTRIBUTE_KEY);
+                return $attribute === $middlewareText . PHP_EOL;
+            }))
+            ->andReturn(new TextResponse($coreText));
         $coreHandlerRef = 'coreHandlerRef';
 
         /** @var RequestHandlerResolverInterface|MockInterface $handlerResolver */
@@ -134,14 +139,6 @@ class LazyRequestHandlerTest extends TestCase
             ->once()
             ->andReturn($coreHandler);
 
-        /** @var MiddlewareInterface $middleware */
-        $middleware = \Mockery::mock(MiddlewareInterface::class);
-        $middleware->shouldReceive('process')
-            ->once()
-            ->with($request, $coreHandler)
-            ->andReturn($response);
-        $middlewareRef = 'middlewareRef';
-
         /** @var MiddlewareResolverInterface|MockInterface $middlewareResolver */
         $middlewareResolver = \Mockery::mock(MiddlewareResolverInterface::class);
         $middlewareResolver->shouldReceive('resolve')
@@ -150,8 +147,10 @@ class LazyRequestHandlerTest extends TestCase
             ->andReturn($middleware);
 
         $app = new LazyRequestHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, [$middlewareRef]);
-        $result = $app->handle($request);
 
-        $this->assertEquals($response, $result);
+        $response = $app->handle($request);
+
+        $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertEquals(join(PHP_EOL, [$coreText, $middlewareText]), $response->getBody()->__toString());
     }
 }

@@ -36,6 +36,9 @@ $container = new YourContainer();
 // 2. create a factory
 $factory = \N1215\Jugoya\RequestHandlerFactory::fromContainer($container);
 
+// LazyRequestHandlerFactory resolves handler and middleware lazily.
+// $factory = \N1215\Jugoya\LazyRequestHandlerFactory::fromContainer($container);
+
 // 3. create an application
 /**
  * You can use one of
