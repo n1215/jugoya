@@ -12,5 +12,5 @@ interface RequestHandlerBuilderInterface
      * @param MiddlewareInterface[]|callable[]|string[] $middlewareRefs
      * @return RequestHandlerInterface
      */
-    public function create($coreHandlerRef, array $middlewareRefs): RequestHandlerInterface;
+    public function build($coreHandlerRef, array $middlewareRefs): RequestHandlerInterface;
 }

@@ -50,7 +50,7 @@ class LazyRequestHandlerBuilder implements RequestHandlerBuilderInterface
      * @return RequestHandlerInterface
      * @throws UnresolvedException
      */
-    public function create($coreHandlerRef, array $middlewareRefs): RequestHandlerInterface
+    public function build($coreHandlerRef, array $middlewareRefs): RequestHandlerInterface
     {
         return new LazyDelegateHandler(
             $this->handlerResolver,

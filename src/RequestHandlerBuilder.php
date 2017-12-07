@@ -50,7 +50,7 @@ class RequestHandlerBuilder implements RequestHandlerBuilderInterface
      * @return RequestHandlerInterface
      * @throws UnresolvedException
      */
-    public function create($coreHandlerRef, array $middlewareRefs): RequestHandlerInterface
+    public function build($coreHandlerRef, array $middlewareRefs): RequestHandlerInterface
     {
         $coreHandler = $this->handlerResolver->resolve($coreHandlerRef);
 

@@ -36,7 +36,7 @@ class LazyRequestHandlerBuilderTest extends TestCase
 
         $factory = LazyRequestHandlerBuilder::fromContainer($container);
 
-        $app = $factory->create($coreHandler, [
+        $app = $factory->build($coreHandler, [
             function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
                 $response = $handler->handle($request);
                 $body = $response->getBody();
