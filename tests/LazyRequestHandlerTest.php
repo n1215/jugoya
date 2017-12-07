@@ -62,6 +62,10 @@ class LazyRequestHandlerTest extends TestCase
             ->once()
             ->andReturn($coreHandler);
 
+        $handlerResolver->shouldReceive('resolve')
+            ->with($coreHandler)
+            ->andReturn($coreHandler);
+
         /** @var MiddlewareResolverInterface|MockInterface $middlewareResolver */
         $middlewareResolver = \Mockery::mock(MiddlewareResolverInterface::class);
         foreach(range(0, $middlewareCount - 1) as $index) {

@@ -6,6 +6,7 @@ use Interop\Http\Server\MiddlewareInterface;
 use Interop\Http\Server\RequestHandlerInterface;
 use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
 use N1215\Jugoya\Resolver\RequestHandlerResolverInterface;
+use N1215\Jugoya\Resolver\UnresolvedException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -52,6 +53,7 @@ class LazyRequestHandler implements RequestHandlerInterface
     /**
      * @param ServerRequestInterface $request
      * @return ResponseInterface
+     * @throws UnresolvedException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -67,17 +69,15 @@ class LazyRequestHandler implements RequestHandlerInterface
                 return $middleware->process($request, $coreHandler);
 
             default:
-                /** @var RequestHandlerInterface $handler */
-                $handler = array_reduce(
-                    array_reverse($this->middlewareRefs),
-                    function(RequestHandlerInterface $handler, $middlewareRef) {
-                        $middleware = $this->middlewareResolver->resolve($middlewareRef);
-                        return new RequestHandler($handler, [$middleware]);
-                    },
-                    $coreHandler
+                $headMiddleware = $this->middlewareResolver->resolve($this->middlewareRefs[0]);
+                $tailMiddlewareRefs = array_slice($this->middlewareRefs, 1, $count - 1);
+                $innerHandler = new self(
+                    $this->handlerResolver,
+                    $this->middlewareResolver,
+                    $coreHandler,
+                    $tailMiddlewareRefs
                 );
-
-                return $handler->handle($request);
+                return $headMiddleware->process($request, $innerHandler);
         }
     }
 }
