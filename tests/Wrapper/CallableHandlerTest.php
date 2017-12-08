@@ -9,31 +9,25 @@ use Psr\Http\Message\ServerRequestInterface;
 class CallableHandlerTest extends TestCase
 {
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function test__invoke()
     {
-        $callable = function (ServerRequestInterface $request) {
+        $response = $this->createMock(ResponseInterface::class);
+        $callable = function (ServerRequestInterface $request) use ($response) {
             $request->getBody();
-            return \Mockery::mock(ResponseInterface::class);
+            return $response;
         };
 
         $handler = new CallableHandler($callable);
 
         /** @var ServerRequestInterface $request */
-        $request = \Mockery::mock(ServerRequestInterface::class);
-        $request->shouldReceive('getBody')->once();
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->expects($this->once())
+            ->method('getBody');
 
-        $handler->handle($request);
+        $result = $handler->handle($request);
+        $this->assertSame($response, $result);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function test__invokeThrowsException()
     {
         $callable = function(ServerRequestInterface $request) {
@@ -43,7 +37,10 @@ class CallableHandlerTest extends TestCase
         $handler = new CallableHandler($callable);
 
         /** @var ServerRequestInterface $request */
-        $request = \Mockery::mock(ServerRequestInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+
+        $this->expectException(\LogicException::class);
+
         $handler->handle($request);
     }
 }

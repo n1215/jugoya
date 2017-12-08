@@ -10,12 +10,6 @@ use Psr\Http\Message\ServerRequestInterface;
 class CallableMiddlewareTest extends TestCase
 {
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function testProcess()
     {
         $callable = function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
@@ -25,23 +19,21 @@ class CallableMiddlewareTest extends TestCase
         $middleware = new CallableMiddleware($callable);
 
         /** @var ServerRequestInterface $request */
-        $request = \Mockery::mock(ServerRequestInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
         /** @var ResponseInterface $response */
-        $response = \Mockery::mock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
         /** @var RequestHandlerInterface $handler */
-        $handler = \Mockery::mock(RequestHandlerInterface::class);
-        $handler->shouldReceive('handle')
-            ->once()
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler->expects($this->once())
+            ->method('handle')
             ->with($request)
-            ->andReturn($response);
+            ->willReturn($response);
 
-        $middleware->process($request, $handler);
+        $result = $middleware->process($request, $handler);
+
+        $this->assertSame($response, $result);
     }
 
-
-    /**
-     * @expectedException \LogicException
-     */
     public function testProcessThrowsException()
     {
         $callable = function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
@@ -51,9 +43,11 @@ class CallableMiddlewareTest extends TestCase
         $middleware = new CallableMiddleware($callable);
 
         /** @var ServerRequestInterface $request */
-        $request = \Mockery::mock(ServerRequestInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
         /** @var RequestHandlerInterface $handler */
-        $handler = \Mockery::mock(RequestHandlerInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
+
+        $this->expectException(\LogicException::class);
         $middleware->process($request, $handler);
     }
 }

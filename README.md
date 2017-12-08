@@ -6,7 +6,7 @@
 [![Code Coverage](https://scrutinizer-ci.com/g/n1215/jugoya/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/n1215/jugoya/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/n1215/jugoya/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/n1215/jugoya/?branch=master)
 
-A simple HTTP application builder using PSR-15 HTTP Server Handler.
+A simple HTTP application builder using PSR-15 HTTP Server Request Handler and Middleware.
 
 > Jugoya is the Japanese full moon festival on the 15th day of the eighth month of the traditional Japanese calendar.
 
@@ -34,10 +34,10 @@ $container = new YourContainer();
 
 
 // 2. create a builder
-$factory = \N1215\Jugoya\RequestHandlerBuilder::fromContainer($container);
+$builder = \N1215\Jugoya\RequestHandlerBuilder::fromContainer($container);
 
 // LazyRequestHandlerBuilder resolves handler and middleware lazily.
-// $factory = \N1215\Jugoya\LazyRequestHandlerBuilder::fromContainer($container);
+// $builder = \N1215\Jugoya\LazyRequestHandlerBuilder::fromContainer($container);
 
 // 3. build a request handler
 /**
@@ -52,7 +52,7 @@ $factory = \N1215\Jugoya\RequestHandlerBuilder::fromContainer($container);
 $coreHandler = new YourApplication();
 
 /** @var RequestHandlerInterface $handler */
-$handler = $factory->build($coreHandler, [
+$handler = $builder->build($coreHandler, [
 
         // You can use instances of PSR-15 MiddlewareInterface
         new YourMiddleware(),
