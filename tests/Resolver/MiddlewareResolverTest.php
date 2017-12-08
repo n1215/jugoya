@@ -5,6 +5,7 @@ namespace N1215\Jugoya\Resolver;
 use Interop\Http\Server\MiddlewareInterface;
 use Interop\Http\Server\RequestHandlerInterface;
 use N1215\Jugoya\Wrapper\CallableMiddleware;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -13,18 +14,12 @@ use Psr\Http\Message\ServerRequestInterface;
 class MiddlewareResolverTest extends TestCase
 {
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function testResolveForMiddlewareInterface()
     {
         /** @var MiddlewareInterface $middleware */
-        $middleware = \Mockery::mock(MiddlewareInterface::class);
+        $middleware = $this->createMock(MiddlewareInterface::class);
         /** @var ContainerInterface $container */
-        $container = \Mockery::mock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
 
         $resolver = new MiddlewareResolver($container);
         $resolved = $resolver->resolve($middleware);
@@ -35,11 +30,11 @@ class MiddlewareResolverTest extends TestCase
     public function testResolveForCallable()
     {
         /** @var ContainerInterface $container */
-        $container = \Mockery::mock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
         $resolver = new MiddlewareResolver($container);
 
         $callable = function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
-            return \Mockery::mock(ResponseInterface::class);
+            return $this->createMock(ResponseInterface::class);
         };
 
         $resolved = $resolver->resolve($callable);
@@ -49,15 +44,15 @@ class MiddlewareResolverTest extends TestCase
     public function testResolveByContainer()
     {
         /** @var MiddlewareInterface $middleware */
-        $middleware = \Mockery::mock(MiddlewareInterface::class);
+        $middleware = $this->createMock(MiddlewareInterface::class);
         $containerId = 'dummyId';
 
-        /** @var ContainerInterface $container */
-        $container = \Mockery::mock(ContainerInterface::class);
-        $container->shouldReceive('get')
-            ->once()
+        /** @var ContainerInterface|MockObject $container */
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->once())
+            ->method('get')
             ->with($containerId)
-            ->andReturn($middleware);
+            ->willReturn($middleware);
         $resolver = new MiddlewareResolver($container);
 
         $resolved = $resolver->resolve($containerId);
@@ -65,74 +60,69 @@ class MiddlewareResolverTest extends TestCase
         $this->assertEquals($resolved, $middleware);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testResolveFailure()
     {
         /** @var ContainerInterface $container */
-        $container = \Mockery::mock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
         $resolver = new MiddlewareResolver($container);
 
         $ref = 123456789;
+        $this->expectException(\InvalidArgumentException::class);
+
         $resolver->resolve($ref);
     }
 
-    /**
-     * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
-     * @expectedExceptionCode  1
-     */
     public function testResolveFailureWhenEntryNotFound()
     {
         $exception = new FakeNotFoundException('not found');
 
-        /** @var ContainerInterface $container */
-        $container = \Mockery::mock(ContainerInterface::class);
+        /** @var ContainerInterface|MockObject $container */
+        $container = $this->createMock(ContainerInterface::class);
         $containerId = 'dummyId';
-        $container->shouldReceive('get')
-            ->once()
+        $container->expects($this->once())
+            ->method('get')
             ->with($containerId)
-            ->andThrow($exception);
+            ->willThrowException($exception);
 
         $resolver = new MiddlewareResolver($container);
+        $this->expectException(UnresolvedException::class);
+        $this->expectExceptionCode(1);
+
         $resolver->resolve($containerId);
     }
 
-    /**
-     * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
-     * @expectedExceptionCode 2
-     */
     public function testResolveFailureWhenContainerException()
     {
         $exception = new FakeContainerException('container exception');
 
-        /** @var ContainerInterface $container */
-        $container = \Mockery::mock(ContainerInterface::class);
+        /** @var ContainerInterface|MockObject $container */
+        $container = $this->createMock(ContainerInterface::class);
         $containerId = 'dummyId';
-        $container->shouldReceive('get')
-            ->once()
+        $container->expects($this->once())
+            ->method('get')
             ->with($containerId)
-            ->andThrow($exception);
+            ->willThrowException($exception);
 
         $resolver = new MiddlewareResolver($container);
+        $this->expectException(UnresolvedException::class);
+        $this->expectExceptionCode(2);
+
         $resolver->resolve($containerId);
     }
 
-    /**
-     * @expectedException \N1215\Jugoya\Resolver\UnresolvedException
-     * @expectedExceptionCODE 3
-     */
     public function testResolveFailureWhenTypeError()
     {
-        /** @var ContainerInterface $container */
-        $container = \Mockery::mock(ContainerInterface::class);
+        /** @var ContainerInterface|MockObject $container */
+        $container = $this->createMock(ContainerInterface::class);
         $containerId = 'dummyId';
-        $container->shouldReceive('get')
-            ->once()
-            ->with($containerId)
-            ->andReturn(new \stdClass());
+        $container->expects($this->once())
+            ->method('get')
+            ->willReturn(new \stdClass());
 
         $resolver = new MiddlewareResolver($container);
+        $this->expectException(UnresolvedException::class);
+        $this->expectExceptionCode(3);
+
         $resolver->resolve($containerId);
     }
 }

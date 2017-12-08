@@ -2,11 +2,10 @@
 
 namespace N1215\Jugoya;
 
-use Interop\Http\Server\MiddlewareInterface;
 use Interop\Http\Server\RequestHandlerInterface;
-use Mockery\MockInterface;
 use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
 use N1215\Jugoya\Resolver\RequestHandlerResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,13 +14,6 @@ use Zend\Diactoros\ServerRequest;
 
 class LazyRequestHandlerTest extends TestCase
 {
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function testProcessWithMultiStack()
     {
         $request = new ServerRequest();
@@ -44,32 +36,35 @@ class LazyRequestHandlerTest extends TestCase
         array_unshift($expectedContent, $coreText);
 
 
-        /** @var RequestHandlerInterface $coreHandler */
-        $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
-        $coreHandler->shouldReceive('handle')
-            ->with(\Mockery::on(function (ServerRequestInterface $request) use ($expectedAttribute){
+        /** @var RequestHandlerInterface|MockObject $coreHandler */
+        $coreHandler = $this->createMock(RequestHandlerInterface::class);
+        $coreHandler->expects($this->once())
+            ->method('handle')
+            ->with($this->callback(function (ServerRequestInterface $request) use ($expectedAttribute){
                 // check Request modification by middleware
                 $attribute = $request->getAttribute(FakeMiddleware::ATTRIBUTE_KEY);
                 return $attribute === join(PHP_EOL, $expectedAttribute) . PHP_EOL;
             }))
-            ->andReturn(new TextResponse($coreText));
+            ->willReturn(new TextResponse($coreText));
         $coreHandlerRef = 'coreHandlerRef';
 
-        /** @var RequestHandlerResolverInterface|MockInterface $handlerResolver */
-        $handlerResolver = \Mockery::mock(RequestHandlerResolverInterface::class);
-        $handlerResolver->shouldReceive('resolve')
+        /** @var RequestHandlerResolverInterface|MockObject $handlerResolver */
+        $handlerResolver = $this->createMock(RequestHandlerResolverInterface::class);
+        $handlerResolver->expects($this->once())
+            ->method('resolve')
             ->with($coreHandlerRef)
-            ->once()
-            ->andReturn($coreHandler);
+            ->willReturn($coreHandler);
 
-        /** @var MiddlewareResolverInterface|MockInterface $middlewareResolver */
-        $middlewareResolver = \Mockery::mock(MiddlewareResolverInterface::class);
-        foreach(range(0, $middlewareCount - 1) as $index) {
-            $middlewareResolver->shouldReceive('resolve')
-                ->once()
-                ->with($middlewareRefs[$index])
-                ->andReturn($middlewareStack[$index]);
-        }
+        /** @var MiddlewareResolverInterface|MockObject $middlewareResolver */
+        $middlewareResolver = $this->createMock(MiddlewareResolverInterface::class);
+
+        $map = array_map(function ($ref, $middleware) {
+            return [$ref, $middleware];
+        }, $middlewareRefs, $middlewareStack);
+
+        $middlewareResolver->expects($this->exactly($middlewareCount))
+            ->method('resolve')
+            ->will($this->returnValueMap($map));
 
         $app = new LazyDelegateHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, $middlewareRefs);
 
@@ -82,28 +77,28 @@ class LazyRequestHandlerTest extends TestCase
     public function testProcessWithEmptyStack()
     {
         /** @var ServerRequestInterface $request */
-        $request = \Mockery::mock(ServerRequestInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
 
         /** @var ResponseInterface $response */
-        $response = \Mockery::mock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        /** @var RequestHandlerInterface $coreHandler */
-        $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
-        $coreHandler->shouldReceive('handle')
-            ->once()
+        /** @var RequestHandlerInterface|MockObject $coreHandler */
+        $coreHandler = $this->createMock(RequestHandlerInterface::class);
+        $coreHandler->expects($this->once())
+            ->method('handle')
             ->with($request)
-            ->andReturn($response);
+            ->willReturn($response);
         $coreHandlerRef = 'coreHandlerRef';
 
-        /** @var RequestHandlerResolverInterface|MockInterface $handlerResolver */
-        $handlerResolver = \Mockery::mock(RequestHandlerResolverInterface::class);
-        $handlerResolver->shouldReceive('resolve')
-            ->once()
+        /** @var RequestHandlerResolverInterface|MockObject $handlerResolver */
+        $handlerResolver = $this->createMock(RequestHandlerResolverInterface::class);
+        $handlerResolver->expects($this->once())
+            ->method('resolve')
             ->with($coreHandlerRef)
-            ->andReturn($coreHandler);
+            ->willReturn($coreHandler);
 
-        /** @var MiddlewareResolverInterface|MockInterface $middlewareResolver */
-        $middlewareResolver = \Mockery::mock(MiddlewareResolverInterface::class);
+        /** @var MiddlewareResolverInterface|MockObject $middlewareResolver */
+        $middlewareResolver = $this->createMock(MiddlewareResolverInterface::class);
 
         $app = new LazyDelegateHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, []);
         $result = $app->handle($request);
@@ -121,30 +116,31 @@ class LazyRequestHandlerTest extends TestCase
 
         $coreText = 'core';
 
-        /** @var RequestHandlerInterface $coreHandler */
-        $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
-        $coreHandler->shouldReceive('handle')
-            ->with(\Mockery::on(function (ServerRequestInterface $request) use ($middlewareText){
+        /** @var RequestHandlerInterface|MockObject $coreHandler */
+        $coreHandler = $this->createMock(RequestHandlerInterface::class);
+        $coreHandler->expects($this->once())
+            ->method('handle')
+            ->with($this->callback(function (ServerRequestInterface $request) use ($middlewareText){
                 // check Request modification by middleware
                 $attribute = $request->getAttribute(FakeMiddleware::ATTRIBUTE_KEY);
                 return $attribute === $middlewareText . PHP_EOL;
             }))
-            ->andReturn(new TextResponse($coreText));
+            ->willReturn(new TextResponse($coreText));
         $coreHandlerRef = 'coreHandlerRef';
 
-        /** @var RequestHandlerResolverInterface|MockInterface $handlerResolver */
-        $handlerResolver = \Mockery::mock(RequestHandlerResolverInterface::class);
-        $handlerResolver->shouldReceive('resolve')
+        /** @var RequestHandlerResolverInterface|MockObject $handlerResolver */
+        $handlerResolver = $this->createMock(RequestHandlerResolverInterface::class);
+        $handlerResolver->expects($this->once())
+            ->method('resolve')
             ->with($coreHandlerRef)
-            ->once()
-            ->andReturn($coreHandler);
+            ->willReturn($coreHandler);
 
-        /** @var MiddlewareResolverInterface|MockInterface $middlewareResolver */
-        $middlewareResolver = \Mockery::mock(MiddlewareResolverInterface::class);
-        $middlewareResolver->shouldReceive('resolve')
-            ->once()
+        /** @var MiddlewareResolverInterface|MockObject $middlewareResolver */
+        $middlewareResolver = $this->createMock(MiddlewareResolverInterface::class);
+        $middlewareResolver->expects($this->once())
+            ->method('resolve')
             ->with($middlewareRef)
-            ->andReturn($middleware);
+            ->willReturn($middleware);
 
         $app = new LazyDelegateHandler($handlerResolver, $middlewareResolver, $coreHandlerRef, [$middlewareRef]);
 

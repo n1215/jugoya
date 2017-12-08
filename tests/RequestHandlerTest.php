@@ -4,6 +4,7 @@ namespace N1215\Jugoya;
 
 use Interop\Http\Server\MiddlewareInterface;
 use Interop\Http\Server\RequestHandlerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -12,13 +13,6 @@ use Zend\Diactoros\ServerRequest;
 
 class RequestHandlerTest extends TestCase
 {
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function testProcessWithMultiStack()
     {
         $request = new ServerRequest();
@@ -39,15 +33,15 @@ class RequestHandlerTest extends TestCase
         array_unshift($expectedContent, $coreText);
 
 
-        /** @var RequestHandlerInterface $coreHandler */
-        $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
-        $coreHandler->shouldReceive('handle')
-            ->with(\Mockery::on(function (ServerRequestInterface $request) use ($expectedAttribute){
+        /** @var RequestHandlerInterface|MockObject $coreHandler */
+        $coreHandler = $this->createMock(RequestHandlerInterface::class);
+        $coreHandler->expects($this->atLeastOnce())->method('handle')
+            ->with($this->callback(function (ServerRequestInterface $request) use ($expectedAttribute){
                 // check Request modification by middleware
                 $attribute = $request->getAttribute(FakeMiddleware::ATTRIBUTE_KEY);
                 return $attribute === join(PHP_EOL, $expectedAttribute) . PHP_EOL;
             }))
-            ->andReturn(new TextResponse($coreText));
+            ->willReturn(new TextResponse($coreText));
 
 
         $app = new DelegateHandler($coreHandler, $middlewareStack);
@@ -61,17 +55,17 @@ class RequestHandlerTest extends TestCase
     public function testProcessWithEmptyStack()
     {
         /** @var ServerRequestInterface $request */
-        $request = \Mockery::mock(ServerRequestInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
 
         /** @var ResponseInterface $response */
-        $response = \Mockery::mock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        /** @var RequestHandlerInterface $coreHandler */
-        $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
-        $coreHandler->shouldReceive('handle')
-            ->once()
+        /** @var RequestHandlerInterface|MockObject $coreHandler */
+        $coreHandler = $this->createMock(RequestHandlerInterface::class);
+        $coreHandler->expects($this->once())
+            ->method('handle')
             ->with($request)
-            ->andReturn($response);
+            ->willReturn($response);
 
         $app = new DelegateHandler($coreHandler, []);
         $result = $app->handle($request);
@@ -82,20 +76,20 @@ class RequestHandlerTest extends TestCase
     public function testProcessWithSingleStack()
     {
         /** @var ServerRequestInterface $request */
-        $request = \Mockery::mock(ServerRequestInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
 
         /** @var ResponseInterface $response */
-        $response = \Mockery::mock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
         /** @var RequestHandlerInterface $coreHandler */
-        $coreHandler = \Mockery::mock(RequestHandlerInterface::class);
+        $coreHandler = $this->createMock(RequestHandlerInterface::class);
 
-        /** @var MiddlewareInterface $middleware */
-        $middleware = \Mockery::mock(MiddlewareInterface::class);
-        $middleware->shouldReceive('process')
-            ->once()
+        /** @var MiddlewareInterface|MockObject $middleware */
+        $middleware = $this->createMock(MiddlewareInterface::class);
+        $middleware->expects($this->once())
+            ->method('process')
             ->with($request, $coreHandler)
-            ->andReturn($response);
+            ->willReturn($response);
 
         $app = new DelegateHandler($coreHandler, [$middleware]);
         $result = $app->handle($request);
