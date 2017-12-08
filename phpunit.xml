@@ -5,11 +5,6 @@
         </testsuite>
     </testsuites>
 
-    <logging>
-        <log type="coverage-html" target="build/coverage"/>
-        <log type="coverage-clover" target="build/coverage.clover"/>
-    </logging>
-
     <filter>
         <whitelist>
             <directory suffix=".php">src</directory>
