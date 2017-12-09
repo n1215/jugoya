@@ -1,0 +1,31 @@
+@startuml
+
+package N1215\Jugoya\Wrapper {
+    class CallableHandler {
+        - $callable: callable
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+    note bottom of CallableHandler: wraps callble having the RequestHandler signature\n and acts as RequestHandler
+
+    class CallableMiddleware {
+        - $callable: callable
+        + process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    }
+    note bottom of CallableMiddleware: wraps callble having the Middleware signature\n and acts as Middleware
+
+    Psr\Http\Server.RequestHandlerInterface <|-- CallableHandler: implements
+    Psr\Http\Server.MiddlewareInterface <|-- CallableMiddleware: implements
+}
+
+
+package Psr\Http\Server {
+    interface RequestHandlerInterface {
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+
+    interface MiddlewareInterface {
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+}
+
+@enduml

@@ -10,19 +10,19 @@ A simple HTTP application builder using PSR-15 HTTP Server Request Handler and M
 
 > Jugoya is the Japanese full moon festival on the 15th day of the eighth month of the traditional Japanese calendar.
 
-# PSR-15 HTTP Server Handler and Middleware
+## PSR-15 HTTP Server Handler and Middleware
 
 ![psr15_middleware](doc/psr15_middleware.png)
 
 See [php-fig/fig-standards](https://github.com/php-fig/fig-standards/blob/master/proposed/http-middleware/middleware.md)
 
 
-# What Jugoya does
+## What Jugoya does
 Jugoya create a new instance of RequestHandlerInterface from a instance of RequestHandlerInterface and instances of MiddlewareInterface.
 ![composition](doc/composition.png)
 
 
-# Code Example
+## Code Example
 
 ```php
 // 1. register handler and middleware dependencies to the PSR-11 Container
@@ -77,6 +77,17 @@ $request = \Zend\Diactoros\ServerRequestBuilder::fromGlobals();
 $response = $handler->handle($request);
 ```
 
-# License
+## Class diagrams
+
+### Jugoya
+![jugoya](doc/jugoya.png)
+
+### Resolver
+![resolver](doc/resolver.png)
+
+### Wrapper
+![wrapper](doc/wrapper.png)
+
+## License
 
 The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.

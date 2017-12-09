@@ -1,0 +1,79 @@
+@startuml
+
+
+package N1215\Jugoya {
+    interface RequestHandlerBuilderInterface {
+        + build($coreHandlerRef, $middlewareRefs): RequestHandlerInterface
+    }
+
+    class RequestHandlerBuilder {
+        - middlewareResolver: MiddlewareResolverInterface
+        - handlerResolver: RequestHandlerResolverInterface
+        + build($coreHandlerRef, $middlewareRefs): RequestHandlerInterface
+        + static fromContainer(ContainerInterface $container): self
+    }
+
+    class LazyRequestHandlerBuilder {
+        - middlewareResolver: MiddlewareResolverInterface
+        - handlerResolver: RequestHandlerResolverInterface
+        + build($coreHandlerRef, $middlewareRefs): RequestHandlerInterface
+        + static fromContainer(ContainerInterface $container): self
+    }
+
+    class DelegateHandler {
+        - $coreHandler: RequestHandlerInterface
+        - $middlewareStack: MiddlewareInterface[]
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+
+    class LazyDelegateHandler {
+        - middlewareResolver: MiddlewareResolverInterface
+        - handlerResolver: RequestHandlerResolverInterface
+        - $coreHandlerRef: RequestHandlerInterface|callable|string
+        - $middlewareRefs: MiddlewareInterface[]|callable[]|string[]
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+
+    RequestHandlerBuilderInterface <|-- RequestHandlerBuilder: implements
+    RequestHandlerBuilderInterface <|-- LazyRequestHandlerBuilder: implements
+    Psr\Http\Server.RequestHandlerInterface <- RequestHandlerBuilderInterface: create
+
+    RequestHandlerBuilder o-- N1215\Jugoya\Resolver.RequestHandlerResolverInterface
+    RequestHandlerBuilder o-- N1215\Jugoya\Resolver.MiddlewareResolverInterface
+    LazyRequestHandlerBuilder o-- N1215\Jugoya\Resolver.RequestHandlerResolverInterface
+    LazyRequestHandlerBuilder o-- N1215\Jugoya\Resolver.MiddlewareResolverInterface
+
+    DelegateHandler <-- RequestHandlerBuilder: create
+    LazyDelegateHandler <-- LazyRequestHandlerBuilder: create
+
+    Psr\Http\Server.RequestHandlerInterface <|-- DelegateHandler: implements
+    Psr\Http\Server.RequestHandlerInterface <|-- LazyDelegateHandler: implements
+
+
+    DelegateHandler o-- Psr\Http\Server.RequestHandlerInterface
+    DelegateHandler o-- Psr\Http\Server.MiddlewareInterface
+}
+
+package N1215\Jugoya\Resolver {
+    interface RequestHandlerResolverInterface {
+        resolve($requestHandlerRef): RequestHandlerInterface
+    }
+    interface MiddlewareResolverInterface {
+        resolve($requestHandlerRef): MiddlewareInterface
+    }
+}
+
+package Psr\Http\Server {
+    interface RequestHandlerInterface {
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+    note left of RequestHandlerInterface: PSR-15 Server Request Handler
+
+    interface MiddlewareInterface {
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+    note top of MiddlewareInterface: PSR-15 Server Middleware
+
+}
+
+@enduml

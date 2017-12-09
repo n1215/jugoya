@@ -1,0 +1,60 @@
+@startuml
+
+package N1215\Jugoya\Resolver {
+    interface RequestHandlerResolverInterface {
+        + resolve($requestHandlerRef): RequestHandlerInterface
+    }
+    interface MiddlewareResolverInterface {
+        + resolve($requestHandlerRef): MiddlewareInterface
+    }
+
+    class RequestHandlerResolver {
+        - $container: ContainerInterface
+        + resolve($requestHandlerRef): RequestHandlerInterface
+    }
+    class MiddlewareResolver {
+        - $container: ContainerInterface
+        + resolve($requestHandlerRef): MiddlewareInterface
+    }
+
+    Psr\Http\Server.RequestHandlerInterface <-- RequestHandlerResolverInterface: create
+    Psr\Http\Server.MiddlewareInterface <-- MiddlewareResolverInterface: create
+
+    RequestHandlerResolverInterface <|-- RequestHandlerResolver: implement
+    MiddlewareResolverInterface <|-- MiddlewareResolver: implement
+
+    Psr\Container.ContainerInterface --o RequestHandlerResolver
+    Psr\Container.ContainerInterface --o MiddlewareResolver
+
+    N1215\Jugoya\Wrapper.CallableHandler <-- RequestHandlerResolver: use
+    N1215\Jugoya\Wrapper.CallableMiddleware <-- MiddlewareResolver: use
+}
+
+package N1215\Jugoya\Wrapper {
+    class CallableHandler {
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+    class CallableMiddleware {
+        + process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    }
+}
+
+package Psr\Container {
+    interface ContainerInterface {
+        + get($id)
+        + has($id): bool
+    }
+    note left of ContainerInterface: PSR-11 Container
+}
+
+package Psr\Http\Server {
+    interface RequestHandlerInterface {
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+
+    interface MiddlewareInterface {
+        + handle(ServerRequestInterface $request): ResponseInterface
+    }
+}
+
+@enduml
