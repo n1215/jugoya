@@ -27,9 +27,9 @@ class LazyRequestHandlerBuilderTest extends TestCase
                 [FakeHandler::class, new FakeHandler('handler')],
             ]));
 
-        $factory = LazyRequestHandlerBuilder::fromContainer($container);
+        $builder = LazyRequestHandlerBuilder::fromContainer($container);
 
-        $app = $factory->build($coreHandler, [
+        $app = $builder->build($coreHandler, [
             function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
                 $response = $handler->handle($request);
                 $body = $response->getBody();
@@ -67,7 +67,7 @@ class LazyRequestHandlerBuilderTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = $this->createMock(ContainerInterface::class);
-        $factory = LazyRequestHandlerBuilder::fromContainer($container);
-        $this->assertInstanceOf(LazyRequestHandlerBuilder::class, $factory);
+        $builder = LazyRequestHandlerBuilder::fromContainer($container);
+        $this->assertInstanceOf(LazyRequestHandlerBuilder::class, $builder);
     }
 }

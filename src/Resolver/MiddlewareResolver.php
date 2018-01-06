@@ -6,7 +6,7 @@ use Interop\Http\Server\MiddlewareInterface;
 use N1215\Jugoya\Wrapper\CallableMiddleware;
 use Psr\Container\ContainerInterface;
 
-class MiddlewareResolver implements MiddlewareResolverInterface
+final class MiddlewareResolver implements MiddlewareResolverInterface
 {
     use ResolverTrait;
 

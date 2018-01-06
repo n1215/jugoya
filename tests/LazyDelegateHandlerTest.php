@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequest;
 
-class LazyRequestHandlerTest extends TestCase
+class LazyDelegateHandlerTest extends TestCase
 {
     public function testProcessWithMultiStack()
     {
@@ -21,7 +21,7 @@ class LazyRequestHandlerTest extends TestCase
         $expectedContent = [];
         $expectedAttribute = [];
 
-        $middlewareCount = 3;
+        $middlewareCount = 20;
         $middlewareStack = [];
         $middlewareRefs = [];
         foreach(range(0, $middlewareCount - 1) as $index) {

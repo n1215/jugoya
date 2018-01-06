@@ -11,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequest;
 
-class RequestHandlerTest extends TestCase
+class DelegateHandlerTest extends TestCase
 {
     public function testProcessWithMultiStack()
     {
@@ -20,7 +20,7 @@ class RequestHandlerTest extends TestCase
         $expectedContent = [];
         $expectedAttribute = [];
 
-        $middlewareCount = 3;
+        $middlewareCount = 20;
         $middlewareStack = [];
         foreach(range(0, $middlewareCount - 1) as $index) {
             $middlewareText = 'middleware-' . $index;
@@ -32,7 +32,6 @@ class RequestHandlerTest extends TestCase
         $coreText = 'core';
         array_unshift($expectedContent, $coreText);
 
-
         /** @var RequestHandlerInterface|MockObject $coreHandler */
         $coreHandler = $this->createMock(RequestHandlerInterface::class);
         $coreHandler->expects($this->atLeastOnce())->method('handle')
@@ -42,7 +41,6 @@ class RequestHandlerTest extends TestCase
                 return $attribute === join(PHP_EOL, $expectedAttribute) . PHP_EOL;
             }))
             ->willReturn(new TextResponse($coreText));
-
 
         $app = new DelegateHandler($coreHandler, $middlewareStack);
 
@@ -88,7 +86,7 @@ class RequestHandlerTest extends TestCase
         $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware->expects($this->once())
             ->method('process')
-            ->with($request, $coreHandler)
+            ->with($request, $this->isInstanceOf(DelegateHandler::class))
             ->willReturn($response);
 
         $app = new DelegateHandler($coreHandler, [$middleware]);

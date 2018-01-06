@@ -6,7 +6,7 @@ use Interop\Http\Server\RequestHandlerInterface;
 use N1215\Jugoya\Wrapper\CallableHandler;
 use Psr\Container\ContainerInterface;
 
-class RequestHandlerResolver implements RequestHandlerResolverInterface
+final class RequestHandlerResolver implements RequestHandlerResolverInterface
 {
     use ResolverTrait;
 

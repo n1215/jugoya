@@ -6,7 +6,7 @@ use Interop\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class CallableHandler implements RequestHandlerInterface
+final class CallableHandler implements RequestHandlerInterface
 {
 
     /**

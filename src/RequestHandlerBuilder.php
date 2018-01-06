@@ -11,7 +11,7 @@ use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
 use N1215\Jugoya\Resolver\UnresolvedException;
 use Psr\Container\ContainerInterface;
 
-class RequestHandlerBuilder implements RequestHandlerBuilderInterface
+final class RequestHandlerBuilder implements RequestHandlerBuilderInterface
 {
     /**
      * @var RequestHandlerResolverInterface

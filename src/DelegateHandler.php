@@ -7,7 +7,7 @@ use Interop\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class DelegateHandler implements RequestHandlerInterface
+final class DelegateHandler implements RequestHandlerInterface
 {
 
     /**
@@ -47,24 +47,11 @@ class DelegateHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $count = count($this->middlewareStack);
-
-        switch ($count) {
-            case 0:
-                return $this->coreHandler->handle($request);
-            case 1:
-                return $this->middlewareStack[0]->process($request, $this->coreHandler);
-            default:
-                /** @var RequestHandlerInterface $handler */
-                $handler = array_reduce(
-                    array_reverse($this->middlewareStack),
-                    function(RequestHandlerInterface $handler, MiddlewareInterface $middleware) {
-                        return new self($handler, [$middleware]);
-                    },
-                    $this->coreHandler
-                );
-
-                return $handler->handle($request);
+        if (count($this->middlewareStack) === 0) {
+            return $this->coreHandler->handle($request);
         }
+
+        $headMiddleware = array_shift($this->middlewareStack);
+        return $headMiddleware->process($request, $this);
     }
 }

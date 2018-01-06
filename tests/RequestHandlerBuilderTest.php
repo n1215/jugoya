@@ -31,9 +31,9 @@ class RequestHandlerBuilderTest extends TestCase
                 ])
             );
 
-        $factory = RequestHandlerBuilder::fromContainer($container);
+        $builder = RequestHandlerBuilder::fromContainer($container);
 
-        $app = $factory->build($coreHandler, [
+        $app = $builder->build($coreHandler, [
             function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
                 $response = $handler->handle($request);
                 $body = $response->getBody();
@@ -71,7 +71,7 @@ class RequestHandlerBuilderTest extends TestCase
     {
         /** @var ContainerInterface $container */
         $container = $this->createMock(ContainerInterface::class);
-        $factory = RequestHandlerBuilder::fromContainer($container);
-        $this->assertInstanceOf(RequestHandlerBuilder::class, $factory);
+        $builder = RequestHandlerBuilder::fromContainer($container);
+        $this->assertInstanceOf(RequestHandlerBuilder::class, $builder);
     }
 }
