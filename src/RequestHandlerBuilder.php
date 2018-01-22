@@ -37,11 +37,11 @@ final class RequestHandlerBuilder implements RequestHandlerBuilderInterface
 
     /**
      * @param ContainerInterface $container
-     * @return static
+     * @return self
      */
-    public static function fromContainer(ContainerInterface $container)
+    public static function fromContainer(ContainerInterface $container): self
     {
-        return new static(new RequestHandlerResolver($container), new MiddlewareResolver($container));
+        return new self(new RequestHandlerResolver($container), new MiddlewareResolver($container));
     }
 
     /**

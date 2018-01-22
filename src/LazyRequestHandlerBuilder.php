@@ -8,7 +8,6 @@ use N1215\Jugoya\Resolver\RequestHandlerResolver;
 use N1215\Jugoya\Resolver\RequestHandlerResolverInterface;
 use N1215\Jugoya\Resolver\MiddlewareResolver;
 use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
-use N1215\Jugoya\Resolver\UnresolvedException;
 use Psr\Container\ContainerInterface;
 
 final class LazyRequestHandlerBuilder implements RequestHandlerBuilderInterface
@@ -37,11 +36,11 @@ final class LazyRequestHandlerBuilder implements RequestHandlerBuilderInterface
 
     /**
      * @param ContainerInterface $container
-     * @return static
+     * @return self
      */
-    public static function fromContainer(ContainerInterface $container)
+    public static function fromContainer(ContainerInterface $container): self
     {
-        return new static(new RequestHandlerResolver($container), new MiddlewareResolver($container));
+        return new self(new RequestHandlerResolver($container), new MiddlewareResolver($container));
     }
 
     /**

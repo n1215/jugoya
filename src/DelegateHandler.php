@@ -47,11 +47,16 @@ final class DelegateHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        if (count($this->middlewareStack) === 0) {
+        $count = count($this->middlewareStack);
+        if ($count === 0) {
             return $this->coreHandler->handle($request);
         }
 
-        $headMiddleware = array_shift($this->middlewareStack);
-        return $headMiddleware->process($request, $this);
+        $innerDelegate = new self(
+            $this->coreHandler,
+            array_slice($this->middlewareStack, 1, $count - 1)
+        );
+
+        return $this->middlewareStack[0]->process($request, $innerDelegate);
     }
 }

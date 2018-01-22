@@ -57,12 +57,21 @@ final class LazyDelegateHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        if (count($this->middlewareRefs) === 0) {
+        $count = count($this->middlewareRefs);
+        if ($count === 0) {
             $coreHandler = $this->handlerResolver->resolve($this->coreHandlerRef);
             return $coreHandler->handle($request);
         }
 
-        $headMiddleware = $this->middlewareResolver->resolve(array_shift($this->middlewareRefs));
-        return $headMiddleware->process($request, $this);
+        $headMiddleware = $this->middlewareResolver->resolve($this->middlewareRefs[0]);
+
+        $innerDelegate = new self(
+            $this->handlerResolver,
+            $this->middlewareResolver,
+            $this->coreHandlerRef,
+            array_slice($this->middlewareRefs, 1, $count - 1)
+        );
+
+        return $headMiddleware->process($request, $innerDelegate);
     }
 }

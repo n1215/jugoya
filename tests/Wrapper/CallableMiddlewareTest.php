@@ -3,6 +3,7 @@
 namespace N1215\Jugoya\Wrapper;
 
 use Interop\Http\Server\RequestHandlerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -18,11 +19,11 @@ class CallableMiddlewareTest extends TestCase
 
         $middleware = new CallableMiddleware($callable);
 
-        /** @var ServerRequestInterface $request */
+        /** @var ServerRequestInterface|MockObject $request */
         $request = $this->createMock(ServerRequestInterface::class);
-        /** @var ResponseInterface $response */
+        /** @var ResponseInterface|MockObject $response */
         $response = $this->createMock(ResponseInterface::class);
-        /** @var RequestHandlerInterface $handler */
+        /** @var RequestHandlerInterface|MockObject $handler */
         $handler = $this->createMock(RequestHandlerInterface::class);
         $handler->expects($this->once())
             ->method('handle')
@@ -34,7 +35,7 @@ class CallableMiddlewareTest extends TestCase
         $this->assertSame($response, $result);
     }
 
-    public function testProcessThrowsException()
+    public function testProcessThrowsTypeError()
     {
         $callable = function(ServerRequestInterface $request, RequestHandlerInterface $handler) {
             return 'not a response';
@@ -47,7 +48,7 @@ class CallableMiddlewareTest extends TestCase
         /** @var RequestHandlerInterface $handler */
         $handler = $this->createMock(RequestHandlerInterface::class);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(\TypeError::class);
         $middleware->process($request, $handler);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace N1215\Jugoya\Wrapper;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -9,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class CallableHandlerTest extends TestCase
 {
 
-    public function test__invoke()
+    public function testHandle()
     {
         $response = $this->createMock(ResponseInterface::class);
         $callable = function (ServerRequestInterface $request) use ($response) {
@@ -19,7 +20,7 @@ class CallableHandlerTest extends TestCase
 
         $handler = new CallableHandler($callable);
 
-        /** @var ServerRequestInterface $request */
+        /** @var ServerRequestInterface|MockObject $request */
         $request = $this->createMock(ServerRequestInterface::class);
         $request->expects($this->once())
             ->method('getBody');
@@ -28,7 +29,7 @@ class CallableHandlerTest extends TestCase
         $this->assertSame($response, $result);
     }
 
-    public function test__invokeThrowsException()
+    public function testHandleThrowsTypeError()
     {
         $callable = function(ServerRequestInterface $request) {
             return 'not a response';
@@ -39,7 +40,7 @@ class CallableHandlerTest extends TestCase
         /** @var ServerRequestInterface $request */
         $request = $this->createMock(ServerRequestInterface::class);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(\TypeError::class);
 
         $handler->handle($request);
     }

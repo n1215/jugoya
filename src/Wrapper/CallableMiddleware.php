@@ -30,12 +30,6 @@ final class CallableMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $response = call_user_func($this->callable, $request, $handler);
-
-        if (!$response instanceof ResponseInterface) {
-            throw new \LogicException('callable must return an instance of \Psr\Http\Message\ResponseInterface.');
-        }
-
-        return $response;
+        return call_user_func($this->callable, $request, $handler);
     }
 }

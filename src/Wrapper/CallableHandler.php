@@ -28,12 +28,6 @@ final class CallableHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $response = call_user_func($this->callable, $request);
-
-        if (!$response instanceof ResponseInterface) {
-            throw new \LogicException('callable must return an instance of Psr\Http\Message\ResponseInterface.');
-        }
-
-        return $response;
+        return call_user_func($this->callable, $request);
     }
 }
