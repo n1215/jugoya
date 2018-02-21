@@ -2,7 +2,7 @@
 
 namespace N1215\Jugoya\Resolver;
 
-use Interop\Http\Server\RequestHandlerInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use N1215\Jugoya\Wrapper\CallableHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

@@ -2,8 +2,8 @@
 
 namespace N1215\Jugoya;
 
-use Interop\Http\Server\MiddlewareInterface;
-use Interop\Http\Server\RequestHandlerInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 interface RequestHandlerBuilderInterface
 {

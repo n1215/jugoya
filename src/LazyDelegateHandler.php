@@ -2,8 +2,8 @@
 
 namespace N1215\Jugoya;
 
-use Interop\Http\Server\MiddlewareInterface;
-use Interop\Http\Server\RequestHandlerInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use N1215\Jugoya\Resolver\MiddlewareResolverInterface;
 use N1215\Jugoya\Resolver\RequestHandlerResolverInterface;
 use N1215\Jugoya\Resolver\UnresolvedException;
